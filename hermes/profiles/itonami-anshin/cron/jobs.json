@@ -1,0 +1,26 @@
+{
+  "jobs": [
+    {
+      "base_url": "https://api.murakumo.cloud/v1",
+      "context_from": null,
+      "deliver": "local",
+      "enabled": true,
+      "enabled_toolsets": null,
+      "id": "83bd688a40db",
+      "model": "mishima",
+      "name": "itonami-anshin-tick",
+      "no_agent": false,
+      "prompt": "itonami-anshin: SOUL.md の 1 反復を実行。legal/money/health/loneliness/disaster のうち drafts/ で最も薄い領域を 1 つ選び、既存の tate-*/kyosai/mitate/iyashi を根拠に『まず何をするか(3手以内)/誰に聞くか(出典確認済みのみ)/分からないこと』を drafts/<domain>/ に下書きする。診断・法的助言をしない。出典のない電話番号・数字は書かない。危機表現は下書きを止めて人間へ引き継ぐ。外部送信はしない。変更は branch→PR、merge は人間。報告: 領域/追加した下書き/未確認事項/次の1アクション。",
+      "provider": "murakumo",
+      "schedule": {
+        "kind": "cron",
+        "expr": "20 4-22/6 * * *",
+        "display": "20 4-22/6 * * *"
+      },
+      "script": null,
+      "skill": null,
+      "skills": [],
+      "workdir": null
+    }
+  ]
+}

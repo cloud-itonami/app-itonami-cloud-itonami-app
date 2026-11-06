@@ -30,6 +30,7 @@ sessions, memories, logs, caches, run state.
 | `itonami-winfix` |  |
 | `itonami-winfix-qa` | itonami qa |
 | `refactor` | refactor — clj, cljc を kotoba に refactor するよ. jvm 依存を外して, amu, kotoba |
+| `itonami-anshin` | 不安(法律・お金・健康・孤立・災害)に応える安心ガイド。根拠付きの次の一手と公的窓口を下書きする。draft-only・診断しない・人を評価しない |
 | `reuse-operations` | 不用品回収・遺品整理・リユース／リサイクル事業の運営支援（source profile、接続・定期実行は別途設定） |
 
 Agency setup, permissions and qualification boundaries: [docs/agency-bots.md](../docs/agency-bots.md).
