@@ -1,0 +1,19 @@
+;; itonami profile (cloud.itonami.profile.v2). Additive to the Hermes layout:
+;; Hermes ignores this file; removing it returns the profile to plain Hermes.
+;; With this file the profile runs on itonami-agent, whose inference rides :inference (murakumo only).
+;; A plain Hermes profile must not use murakumo/mishima (kotoba-lang/itonami-agent/AGENTS.md "Two CLIs"),
+;; so exporting this profile to Hermes needs a non-murakumo model: in config.yaml and cron/jobs.json first.
+{:itonami/schema "cloud.itonami.profile.v2"
+ :profile/id "itonami-anshin"
+ :profile/description "安心ガイド: 不安(法律・お金・健康・孤立・災害)に、根拠のある次の一手と公的窓口を下書きする。draft-only・診断しない・人を評価しない"
+ :profile/hermes-compatible true
+ :agent/kind :worker
+ :invocation :resident
+ :ids {:repo "cloud-itonami/cloud-itonami-app" :yakuwari/id "itonami-anshin"}
+ :authority {:default-decision :approval-required :source :yakuwari :ref "yakuwari.edn"}
+ :capabilities []
+ :state {:workspace :host-local :results :cid-receipts :secrets :never-leave-host}
+ :inference {:rails [:murakumo] :authorities ["api.murakumo.cloud"] :deny-hosts ["openrouter.ai"]}
+ :runtime {:engine :itonami-agent :scheduler :itonami}
+ :placement {:mode :local :order [:local] :inference-rail :murakumo}
+ :cron? true}

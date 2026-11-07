@@ -1,3 +1,5 @@
+# itonami profile: inference rides itonami.edn :inference (murakumo only). Openrouter is denied there.
+# Not a plain Hermes profile: exporting it to Hermes needs a non-murakumo model: here and in cron/jobs.json.
 model:
   provider: murakumo
   base_url: https://api.murakumo.cloud/v1
