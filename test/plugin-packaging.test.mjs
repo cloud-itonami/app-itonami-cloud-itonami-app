@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, mkdtempSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
 import { dirname, resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -36,4 +38,21 @@ test('Agent Plugins packaging is schema-shaped and path-complete (JUN-1064)', ()
   }
   assert.ok(existsSync(join(root, 'skills', 'itonami-app', 'SKILL.md')));
   assert.ok(existsSync(join(root, 'skills', 'setup', 'SKILL.md')));
+});
+
+test('package-plugin.mjs builds a submittable ZIP (JUN-1064 A6)', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'plugin-pkg-'));
+  const out = join(dir, 'plugin.zip');
+  const built = spawnSync(process.execPath, [join(root, 'scripts', 'package-plugin.mjs'), '--out', out], { encoding: 'utf8' });
+  assert.equal(built.status, 0, built.stderr);
+  const list = spawnSync('zipinfo', ['-1', out], { encoding: 'utf8' });
+  assert.equal(list.status, 0, 'zipinfo failed');
+  const names = new Set(list.stdout.split('\n').filter(Boolean));
+  for (const f of ['plugin.json', 'mcp.json', '.codex-plugin/plugin.json',
+    'skills/itonami-app/SKILL.md', 'skills/setup/SKILL.md']) {
+    assert.ok(names.has(f), `missing ${f}`);
+  }
+  for (const n of names) {
+    assert.ok(!/(^|\/)\.(env|token|secret)/.test(n), `secret-like entry ${n}`);
+  }
 });
