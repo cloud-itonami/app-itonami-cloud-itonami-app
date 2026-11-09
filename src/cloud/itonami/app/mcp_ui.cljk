@@ -1,0 +1,81 @@
+(ns cloud.itonami.app.mcp-ui
+  "Codex plugin surface, slice 1 (JUN-1050): Agent Plugins packaging points
+  at the MCP server in `cloud.itonami.app.mcp`, and that server carries the
+  OpenAI MCP Extensions entrypoints.
+
+  Shapes follow the spec at
+  https://github.com/openai/mcp-extensions/blob/main/docs/spec.md:
+
+  - entrypoints live in the tool descriptor `_meta`: `ui.resourceUri` names
+    the UI resource, `openai/ui.entrypoints` lists `global` (sidebar) and
+    `thread` (conversation panel). The server MUST accept `{}` for the
+    entrypoint tool, so `itonami_open` takes no required params.
+  - `initialize` advertises the surface under `capabilities.experimental`
+    on MCP 2025-11-25, the same location the spec uses for
+    `openai/settings`. `server/discover` (MCP 2026-07) is not implemented;
+    see JUN-1050 for the follow-up.
+  - `resources/read` serves the UI resource as `text/html;profile=mcp-app`
+    with `openai/ui.availableDisplayModes` (`inline`, `fullscreen`).
+    Entrypoints render fullscreen; ChatGPT chooses the mode from this item.
+
+  Product code stays in this namespace so the protocol kernel
+  (`org-anthropic-mcp`, shared with other consumers) remains vendor-neutral:
+  `mcp.cljk` merges the metadata in after dispatch.")
+
+(def tool-name "itonami_open")
+
+(def resource-uri "ui://cloud-itonami-app/home")
+
+(def resource-title "Itonami")
+
+(def entrypoint-types ["global" "thread"])
+
+(def display-modes ["inline" "fullscreen"])
+
+(def mime-type "text/html;profile=mcp-app")
+
+(defn tool-meta
+  "The `_meta` block merged onto the entrypoint tool descriptor."
+  []
+  {"ui" {"resourceUri" resource-uri}
+   "openai/ui" {"entrypoints" (mapv (fn [t] {"type" t}) entrypoint-types)}})
+
+(defn entrypoint-tool?
+  [tool-name*]
+  (= tool-name tool-name*))
+
+(defn open-result
+  "The `itonami_open` result. No session, no store, no network: opening the
+  app is naming where it lives, so this answers from constants."
+  []
+  {"app" "cloud-itonami-app"
+   "title" resource-title
+   "resourceUri" resource-uri
+   "entrypoints" entrypoint-types
+   "local" "http://127.0.0.1:1338"
+   "docs" "https://itonami.cloud"})
+
+(defn ui-html
+  "Slice-1 shell: identifies the app and points at the running instance.
+  The full workspace UI stays in the app itself; this resource only gives
+  the entrypoint somewhere to open."
+  []
+  (str "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"
+       "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+       "<title>Itonami</title></head><body>"
+       "<main><h1>Itonami</h1>"
+       "<p>Agent workspace: chat, projects, drive, calendar, Passkey identity.</p>"
+       "<p><a href=\"http://127.0.0.1:1338\">Open the running app</a> · "
+       "<a href=\"https://itonami.cloud\">Docs</a></p>"
+       "</main></body></html>"))
+
+(defn read-response
+  "The `resources/read` result for our UI uri, or nil when the uri is not
+  ours (the caller then keeps the dispatcher's behaviour)."
+  [uri]
+  (when (= resource-uri uri)
+    {"contents" [{"uri" uri
+                  "mimeType" mime-type
+                  "text" (ui-html)
+                  "_meta" {"openai/ui"
+                           {"availableDisplayModes" display-modes}}}]}))

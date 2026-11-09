@@ -1,0 +1,62 @@
+(ns cloud.itonami.app.mcp-ui-test
+  "Codex plugin surface (JUN-1050 slice 1): the entrypoint tool carries
+  `_meta` entrypoints, the UI resource reads, and `initialize` advertises
+  the UI extension. Drives `mcp/respond` directly — no stdio loop."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [cloud.itonami.app.mcp :as mcp]
+            [cloud.itonami.app.mcp-ui :as ui]
+            [cloud.itonami.app.store :as store]))
+
+(def ^:private disabled {})
+
+(defn- respond
+  [request]
+  (with-redefs [store/snapshot (constantly {})]
+    (mcp/respond disabled request)))
+
+(defn- rpc [id method params]
+  (cond-> {"jsonrpc" "2.0" "id" id "method" method}
+    params (assoc "params" params)))
+
+(deftest initialize-advertises-ui-extension
+  (let [response (respond (rpc 1 "initialize" {"protocolVersion" "2025-11-25"}))]
+    (is (= "cloud-itonami-fleet"
+           (get-in response ["result" "serverInfo" "name"])))
+    (is (map? (get-in response ["result" "capabilities" "experimental" "openai/ui"]))
+        "2025-11-25 clients read extensions from capabilities.experimental")))
+
+(deftest tools-list-marks-only-the-entrypoint-tool
+  (let [response (respond (rpc 2 "tools/list" nil))
+        tools (get-in response ["result" "tools"])
+        opener (first (filter #(= ui/tool-name (get % "name")) tools))]
+    (is (some? opener) "itonami_open is always published")
+    (is (= ui/resource-uri
+           (get-in opener ["_meta" "ui" "resourceUri"])))
+    (is (= [{"type" "global"} {"type" "thread"}]
+           (get-in opener ["_meta" "openai/ui" "entrypoints"])))
+    (is (every? #(nil? (get % "_meta"))
+                (remove #(= ui/tool-name (get % "name")) tools))
+        "gated fleet/business tools carry no entrypoints")))
+
+(deftest open-tool-accepts-empty-arguments
+  (let [response (respond (rpc 3 "tools/call"
+                               {"name" ui/tool-name "arguments" {}}))]
+    (is (false? (get-in response ["result" "isError"])))
+    (is (= ui/resource-uri
+           (get-in response ["result" "structuredContent" "resourceUri"])))
+    (is (= "cloud-itonami-app"
+           (get-in response ["result" "structuredContent" "app"])))))
+
+(deftest ui-resource-reads-as-mcp-app-html
+  (let [response (respond (rpc 4 "resources/read" {"uri" ui/resource-uri}))
+        [item] (get-in response ["result" "contents"])]
+    (is (= ui/resource-uri (get item "uri")))
+    (is (= "text/html;profile=mcp-app" (get item "mimeType")))
+    (is (string? (get item "text")))
+    (is (= ["inline" "fullscreen"]
+           (get-in item ["_meta" "openai/ui" "availableDisplayModes"])))))
+
+(deftest unknown-resource-stays-not-found
+  (let [response (respond (rpc 5 "resources/read" {"uri" "ui://no-such-app"}))]
+    (is (= -32601 (get-in response ["error" "code"]))
+        "non-UI uris keep the dispatcher behaviour")))
