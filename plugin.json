@@ -10,7 +10,11 @@
   "homepage": "https://itonami.cloud",
   "repository": "https://github.com/cloud-itonami/cloud-itonami-app",
   "license": "Apache-2.0",
-  "keywords": ["agent", "mcp", "workspace"],
+  "keywords": [
+    "agent",
+    "mcp",
+    "workspace"
+  ],
   "extensions": {
     "com.openai": {
       "interface": {
@@ -19,13 +23,16 @@
         "longDescription": "Search the bundled actor catalog and open the Itonami app from the sidebar or beside a conversation.",
         "developerName": "cloud-itonami",
         "category": "Productivity",
-        "capabilities": ["Read"],
+        "capabilities": [
+          "Read"
+        ],
         "websiteURL": "https://itonami.cloud",
         "defaultPrompt": [
           "Search the Itonami actor catalog for a worker that fits this task.",
           "Open the Itonami app and show me where this work lives."
         ]
-      }
+      },
+      "onboardingSkill": "./skills/setup/SKILL.md"
     }
   }
 }
