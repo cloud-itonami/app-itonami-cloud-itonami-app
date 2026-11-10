@@ -81,6 +81,16 @@ fi
 export AMU="$checkout/bin/amu"
 export AMU_HOME="$checkout"
 
+# amu's launcher resolves its dependency lock from its own checkout root
+# (bin/amu derives root from __filename, not from this repo), and the lock
+# amu ships at the pin names deleted split repos. Overlay this repo's
+# amu-deps-lock.edn (same entry set, monorepo-redirected, digest bound to
+# the pinned amu's deps.edn bytes) and pre-seed the checkouts from one
+# shared mirror with sparse workdirs: the resolver allows pre-existing
+# dirs and still fail-closes on sha + recorded paths.
+cp "$root/amu-deps-lock.edn" "$checkout/deps-lock.edn"
+python3 "$root/scripts/preseed-amu-gitlibs.py" "$root"
+
 if [[ ! -x "$AMU" ]]; then
   echo "amu launcher missing at $AMU" >&2
   exit 1
