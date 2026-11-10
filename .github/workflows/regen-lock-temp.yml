@@ -22,7 +22,7 @@ jobs:
       - name: Install Clojure CLI
         uses: DeLaGuardo/setup-clojure@13
         with:
-          clojure: latest
+          cli: latest
       - name: Install nbb host
         run: npm ci
       - name: Regenerate deps-lock.edn
