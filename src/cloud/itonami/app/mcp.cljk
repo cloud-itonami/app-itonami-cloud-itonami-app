@@ -65,6 +65,7 @@
             [cloud.itonami.app.payment-tools :as payment-tools]
             [cloud.itonami.app.store :as store]
             [cloud.itonami.app.tenant-tools :as tenant-tools]
+            [cloud.itonami.app.mcp-ui :as ui]
             [mcp.execute :as execute]
             [mcp.model :as model]
             [mcp.ports :as ports])
@@ -109,11 +110,16 @@
 
 (defn manifest
   [configuration]
-  (reduce (fn [m {:keys [name description parameters]}]
-            (model/add-tool m name {:description description
-                                    :input-schema parameters}))
-          (model/server server-name server-version)
-          (published-tools configuration)))
+  (-> (reduce (fn [m {:keys [name description parameters]}]
+                (model/add-tool m name {:description description
+                                        :input-schema parameters}))
+              (model/server server-name server-version)
+              (published-tools configuration))
+      (model/add-tool ui/tool-name
+                      {:description "Open the Itonami app (sidebar or conversation panel). Takes no arguments."
+                       :input-schema {:type "object"}})
+      (model/add-resource ui/resource-uri
+                          {:name ui/resource-title :mime ui/mime-type})))
 
 (defn- keywordize
   "JSON gives string keys; the fleet tools read keyword keys. Only the top level
@@ -147,6 +153,7 @@
         (business-tools/call-tool configuration tool-name input)
         (tenant-tools/tool? tool-name)
         (tenant-tools/call-tool configuration tool-name input)
+        (= ui/tool-name tool-name) (ui/open-result)
         (= "fleet_search" tool-name) (fleet/search-tool input)
         (= "fleet_call" tool-name)
         (if (fleet-enabled? configuration)
@@ -168,22 +175,57 @@
   {:tool (reify ports/ITool
            (invoke [_ tool-name args] (invoke configuration tool-name args)))})
 
+(defn- enrich-initialize
+  "Advertise the Codex UI surface. On MCP 2025-11-25 the extensions live in
+  `initialize` capabilities (legacy `experimental`), the same location the
+  MCP Extensions spec uses for `openai/settings`."
+  [response protocol-version]
+  (-> response
+      (assoc-in ["result" "protocolVersion"]
+                (or protocol-version latest-protocol-version))
+      (assoc-in ["result" "capabilities" "experimental" "openai/ui"] {})))
+
+(defn- enrich-tools-list
+  "Merge the entrypoint `_meta` onto the entrypoint tool. The protocol
+  kernel serialises only name/description/inputSchema, so this happens
+  here, in the product layer."
+  [response]
+  (update-in response ["result" "tools"]
+             (fn [tools]
+               (mapv (fn [t]
+                       (if (ui/entrypoint-tool? (get t "name"))
+                         (assoc t "_meta" (ui/tool-meta))
+                         t))
+                     tools))))
+
 (defn respond
   "The JSON-RPC response for one request, or nil when none is owed.
 
   A JSON-RPC notification has no `id`, and the spec forbids replying to one.
   MCP clients send `notifications/initialized` right after `initialize`, so a
   server that answered every message would put an unsolicited error on the wire
-  during the handshake."
+  during the handshake.
+
+  `resources/read` for the UI uri is answered here: the protocol kernel has
+  no `resources/read` handler, and only the product knows the UI resource."
   ([configuration request] (respond configuration request nil))
   ([configuration request protocol-version]
    (when (contains? request "id")
-     (let [response (execute/handle (ports configuration)
-                                    (manifest configuration) request)]
-       (if (= "initialize" (get request "method"))
-         (assoc-in response ["result" "protocolVersion"]
-                   (or protocol-version latest-protocol-version))
-         response)))))
+     (let [method (get request "method")]
+       (if (= "resources/read" method)
+         (if-let [result (ui/read-response (get-in request ["params" "uri"]))]
+           {"jsonrpc" "2.0" "id" (get request "id") "result" result}
+           (execute/handle (ports configuration)
+                           (manifest configuration) request))
+         (let [response (execute/handle (ports configuration)
+                                        (manifest configuration) request)]
+           (cond (= "initialize" method)
+                 (enrich-initialize response protocol-version)
+
+                 (= "tools/list" method)
+                 (enrich-tools-list response)
+
+                 :else response)))))))
 
 (defn- write-line! [writer value]
   (.write writer (json/write-str value))

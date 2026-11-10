@@ -55,6 +55,39 @@
 (def server-version "1")
 (def latest-protocol-version "2025-11-25")
 
+;; Codex entrypoint surface (JUN-1062), mirroring `cloud.itonami.app.mcp-ui`
+;; on the JVM dispatcher. Shapes follow the MCP Extensions spec: entrypoints
+;; in the tool `_meta`, the UI resource read as `text/html;profile=mcp-app`.
+;; Kept inline because this host is a self-contained script.
+(def entrypoint-tool-name "itonami_open")
+(def ui-resource-uri "ui://cloud-itonami-app/home")
+(def ui-resource-title "Itonami")
+(def ui-entrypoint-types ["global" "thread"])
+(def ui-display-modes ["inline" "fullscreen"])
+(def ui-mime-type "text/html;profile=mcp-app")
+
+(defn- entrypoint-meta []
+  {"ui" {"resourceUri" ui-resource-uri}
+   "openai/ui" {"entrypoints" (mapv (fn [t] {"type" t}) ui-entrypoint-types)}})
+
+(defn- entrypoint-result []
+  {"app" "cloud-itonami-app"
+   "title" ui-resource-title
+   "resourceUri" ui-resource-uri
+   "entrypoints" ui-entrypoint-types
+   "local" "http://127.0.0.1:1338"
+   "docs" "https://itonami.cloud"})
+
+(defn- ui-shell-html []
+  (str "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"
+       "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+       "<title>Itonami</title></head><body>"
+       "<main><h1>Itonami</h1>"
+       "<p>Agent workspace: chat, projects, drive, calendar, Passkey identity.</p>"
+       "<p><a href=\"http://127.0.0.1:1338\">Open the running app</a> · "
+       "<a href=\"https://itonami.cloud\">Docs</a></p>"
+       "</main></body></html>"))
+
 (def catalog-path
   (path/resolve app-directory "resources" "itonami-fleet-catalog.edn"))
 
@@ -157,7 +190,8 @@
                         requested
                         latest-protocol-version)]
           (result id {"protocolVersion" version
-                      "capabilities" {"tools" {}}
+                      "capabilities" {"tools" {}
+                                      "experimental" {"openai/ui" {}}}
                       "serverInfo" {"name" server-name
                                     "version" server-version}
                       "runtime" "guest-wasm"
@@ -167,26 +201,45 @@
         (result id {})
 
         "tools/list"
-        (result id {"tools" (mapv (fn [t]
-                                    {"name" (:name t)
-                                     "description" (:description t)
-                                     "inputSchema" (:inputSchema t)})
-                                  tools)})
+        (result id {"tools" (conj (mapv (fn [t]
+                                          {"name" (:name t)
+                                           "description" (:description t)
+                                           "inputSchema" (:inputSchema t)})
+                                        tools)
+                                  {"name" entrypoint-tool-name
+                                   "description" "Open the Itonami app (sidebar or conversation panel). Takes no arguments."
+                                   "inputSchema" {"type" "object"}
+                                   "_meta" (entrypoint-meta)})})
 
         "tools/call"
         (let [tool-name (get params "name")
               args (keywordize (get params "arguments"))]
-          (if (= "fleet_search" tool-name)
-            (try
-              (result id {"content" [{"type" "text"
-                                      "text" (js/JSON.stringify (clj->js (search-tool args)))}]})
-              (catch :default e
+          (cond (= entrypoint-tool-name tool-name)
+                (result id {"content" [{"type" "text"
+                                        "text" (js/JSON.stringify (clj->js (entrypoint-result)))}]})
+
+                (= "fleet_search" tool-name)
+                (try
+                  (result id {"content" [{"type" "text"
+                                          "text" (js/JSON.stringify (clj->js (search-tool args)))}]})
+                  (catch :default e
+                    (result id {"isError" true
+                                "content" [{"type" "text"
+                                            "text" (or (.-message e) (str e))}]})))
+                :else
                 (result id {"isError" true
                             "content" [{"type" "text"
-                                        "text" (or (.-message e) (str e))}]})))
-            (result id {"isError" true
-                        "content" [{"type" "text"
-                                    "text" (str "unknown tool: " tool-name)}]})))
+                                        "text" (str "unknown tool: " tool-name)}]})))
+
+        "resources/read"
+        (let [uri (get params "uri")]
+          (if (= ui-resource-uri uri)
+            (result id {"contents" [{"uri" uri
+                                     "mimeType" ui-mime-type
+                                     "text" (ui-shell-html)
+                                     "_meta" {"openai/ui"
+                                              {"availableDisplayModes" ui-display-modes}}}]})
+            (err id -32601 (str "method not found: resources/read " uri))))
 
         (err id -32601 (str "method not found: " method))))))
 
