@@ -44,3 +44,4 @@ jobs:
 # 2026-11-10: retrigger after kagi revert + override batch.
 # 2026-11-10: retrigger after 5-override batch.
 # 2026-11-10: retrigger after ed25519/osaho + kaiyaku.
+# 2026-11-10: retrigger after bare-sha batch.
