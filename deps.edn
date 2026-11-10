@@ -759,7 +759,7 @@
    :git/sha "c191dd0fecb67f28b9f6eff79269800b45414f89"}
   io.github.etzhayyim/kaiyaku
   {:git/url "https://github.com/etzhayyim/com-etzhayyim-kaiyaku.git"
-   :git/sha "b112a5ce4f61e3c561544e20a6aab5fb15e6c1fa"
+   :git/sha "beb3a40dc41f62fd76cd98e8f424e02f514f783b"
    ;; tate still names the pre-migration coordinate. Both coordinates provide
    ;; the same namespaces, so an uberjar can otherwise retain the older files
    ;; and fail at startup when rdf-canon calls the newer sha384 API.
@@ -957,7 +957,18 @@
     io.github.kotoba-lang/org-chainagnostic-cacao
          {:git/url "https://github.com/kotoba-lang/kotoba.git"
           :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
-          :deps/root "lib/org.chainagnostic.cacao"}}}
+          :deps/root "lib/org.chainagnostic.cacao"}
+    ;; inga's b94158fd subtree (kotobaFleet/biscuit/jws/sdJwtVc manifests)
+    ;; still names deleted org-ietf-ed25519/osaho. Same-namespace monorepo
+    ;; targets; both manifests are local-only.
+    io.github.kotoba-lang/org-ietf-ed25519
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/org.ietf.ed25519"}
+    io.github.kotoba-lang/osaho
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.osaho"}}}
  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.8"}}
           :ns-default build}
   :release-sign {:extra-paths ["dev"]
