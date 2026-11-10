@@ -841,6 +841,23 @@
          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioFilecoinTransport"}}
 
+ ;; Graph-wide dead-URL overrides. A top-level :deps floor only wins version
+ ;; selection -- tools.deps still clones every losing candidate URL, so a
+ ;; deleted split repo fails resolution closed even when floored. An
+ ;; :override-deps entry REPLACES the coordinate everywhere it is named, so
+ ;; the dead URL is never fetched. Add here (top level: the lock regen runs
+ ;; `clojure -Spath` with no aliases) when a reachable manifest names a
+ ;; deleted split. Precedent: :product-kir-gen's osaho/io-multiformats/io-ipld.
+ :override-deps
+ {;; kotobase@HEAD still names deleted kotobase-engine.git (404). The app
+  ;; uses kotobase.local/store only (neither requires kotobase.engine.*),
+  ;; and the monorepo carries the same namespace family, so even
+  ;; kotobase.core keeps resolving.
+  io.github.kotoba-lang/kotobase-engine
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.kotobaseEngineContract"}}
+
  :aliases
  {:build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.8"}}
           :ns-default build}
@@ -891,15 +908,15 @@
    :override-deps
    {io.github.kotoba-lang/osaho
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.osaho"}
     io.github.kotoba-lang/io-multiformats
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioMultiformats"}
     io.github.kotoba-lang/io-ipld
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioIpld"}}
    :main-opts ["-m" "gen-product-policy-kir"]}
   :collection-test {:extra-paths ["test"] :main-opts ["-m" "collection-nbb"]}
@@ -914,7 +931,7 @@
                       ;; interpreter (ADR-0037). `tender-native` redirects here.
                       io.github.kotoba-lang/kototama-native
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.kototamaNative"}}
          ;; `kotoba-lang/compiler` is TEST-ONLY here, for the decision-core
          ;; parity gate (`policy-kotoba-parity-test` over
@@ -991,15 +1008,15 @@
           ;; `:unknown-function` if left behind).
           io.github.kotoba-lang/osaho
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.osaho"}
           io.github.kotoba-lang/io-multiformats
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioMultiformats"}
           io.github.kotoba-lang/io-ipld
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioIpld"}}
          :jvm-opts ["-Dcloud.itonami.data-dir=target/test-data"]
          :main-opts ["-m" "cloud.itonami.app.test-runner"]}
