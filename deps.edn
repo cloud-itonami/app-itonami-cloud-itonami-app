@@ -1009,7 +1009,15 @@
     io.github.kotoba-lang/tech-ipfs-specs-ipns
          {:git/url "https://github.com/kotoba-lang/kotoba.git"
           :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
-          :deps/root "lib/kotoba.techIpfsSpecsIpns"}}}
+          :deps/root "lib/kotoba.techIpfsSpecsIpns"}
+    ;; cloud-filecoin and io-filecoin-transport each carry a :local/root
+    ;; io-filecoin; the two worktrees give the same lib name two unrelated
+    ;; local paths with no ancestor relationship. A single git coordinate
+    ;; wins outright (same content, one checkout).
+    io.github.kotoba-lang/io-filecoin
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.ioFilecoin"}}}
  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.8"}}
           :ns-default build}
   :release-sign {:extra-paths ["dev"]
