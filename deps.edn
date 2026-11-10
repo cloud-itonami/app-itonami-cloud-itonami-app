@@ -1037,7 +1037,37 @@
     io.github.kotoba-lang/ooxml
          {:git/url "https://github.com/kotoba-lang/kotoba.git"
           :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
-          :deps/root "lib/kotoba.ooxml"}}}
+          :deps/root "lib/kotoba.ooxml"}
+    ;; inga@10bbca4 floors io/coll/edn/test/text/kotobase-storage/arrangement
+    ;; at the September monorepo pin b94158fd. Top-level floors win version
+    ;; selection but tools.deps still materializes the losing b94158fd
+    ;; worktree for comparison (and fails the checkout under disk pressure).
+    ;; Overrides replace those coords graph-wide, so the old pin loses all
+    ;; referrers and is never fetched. Targets duplicate the existing floors.
+    io.github.kotoba-lang/io
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.io"}
+    io.github.kotoba-lang/coll
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.coll"}
+    io.github.kotoba-lang/edn
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.edn"}
+    io.github.kotoba-lang/test
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.test"}
+    io.github.kotoba-lang/kotobase-storage
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.kotobaseStorage"}
+    io.github.kotoba-lang/arrangement
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.arrangement"}}}
  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.8"}}
           :ns-default build}
   :release-sign {:extra-paths ["dev"]
