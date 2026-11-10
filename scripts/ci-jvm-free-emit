@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# CI: amu --jvm-free emit + public kotoba compile launcher.
-# Java/clojure must not be on PATH. kexe verify on Linux stays HOLD.
+# CI: native-CLI emit (owner-approved interim; amu-JS emitter dead) + public
+# kotoba compile launcher. Java/clojure must not be on PATH (the v0.7.3
+# emitter is runtime native-jvm-free). Sealed-KEXE emit is out of scope
+# until a native KEXE path exists; it has no consumer in CI.
 set -euo pipefail
 
 root="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -59,11 +61,27 @@ fi
 export KBB_ENGINE="$engine"
 PATH="$kbb_home/bin:$PATH"
 export PATH
-# Force the amu emitter: without this bin/kotoba probes for a native kotoba
-# CLI on PATH, and the kotoba launcher the kbb checkout ships cannot run on a
-# JVM-free runner (its own path needs the JVM; measured 2026-09-13, CI failed
-# with "native kotoba CLI did not emit" after a 30-dep classpath refusal).
-export KOTOBA_EMITTER=amu
+# Emitter is the pinned native kotoba CLI (owner-approved interim,
+# 2026-11-10): amu-JS at the :amu pin cannot load post-rename .cljk lib
+# sources (nbb has no .cljk loader; pre-rename split .cljc blobs are deleted
+# and unarchived), so no amu-JS emit of current entries is possible. The
+# v0.7.3 CLI is runtime native-jvm-free, so the JVM-free constraint holds;
+# the old KOTOBA_EMITTER=amu forcing is gone (amu is kept only for
+# browser-host.mjs below).
+kotoba_cli_dir="$root/target/kotoba-cli"
+kotoba_cli="$kotoba_cli_dir/kotoba"
+if [[ ! -x "$kotoba_cli" ]]; then
+  rm -rf "$kotoba_cli_dir"
+  mkdir -p "$kotoba_cli_dir"
+  tarball="$kotoba_cli_dir/kotoba-linux-amd64.tar.gz"
+  curl -sL --max-time 300 "https://github.com/kotoba-lang/kotoba/releases/download/v0.7.3/kotoba-linux-amd64.tar.gz" -o "$tarball"
+  echo "6b14c81619cf019feed5ca8a295fb27db34883bbaca4a547e98a3db398e2e058  $tarball" | sha256sum -c -
+  tar xzf "$tarball" -C "$kotoba_cli_dir"
+  chmod +x "$kotoba_cli"
+fi
+echo "kotoba CLI binary sha256 $(sha256sum "$kotoba_cli" | cut -d' ' -f1)"
+export KOTOBA_CLI="$kotoba_cli"
+export KOTOBA_EMITTER=native
 if [[ ! -f "$KBB_ENGINE" ]]; then
   echo "kbb engine missing: $KBB_ENGINE" >&2
   exit 1
@@ -106,28 +124,9 @@ if command -v java >/dev/null 2>&1 || command -v clojure >/dev/null 2>&1; then
   exit 1
 fi
 
-kbb --backend sci --classpath bin bin/compile-amu
-
-for artifact in server_main.wasm mcp_main.wasm server_main.kexe mcp_main.kexe; do
-  path="$root/target/amu/$artifact"
-  if [[ ! -s "$path" ]]; then
-    echo "missing or empty artifact: $path" >&2
-    exit 1
-  fi
-  if [[ ! -s "$path.provenance.edn" ]]; then
-    echo "missing provenance: $path.provenance.edn" >&2
-    exit 1
-  fi
-  echo "ok artifact $(wc -c < "$path") bytes $artifact"
-done
-
-if [[ ! -s "$root/target/amu/browser-host.mjs" ]]; then
-  echo "browser-host.mjs was not copied next to the artifacts" >&2
-  exit 1
-fi
-
 # Public compile launcher: file on disk AND :compile/emitted.
-# amu {:ok true} alone is not this envelope.
+# (Was below the asserts when compile-amu emitted first; now measure IS the
+# emit, so the asserts below check what it wrote.)
 measure() {
   local entry="$1"
   local out="$2"
@@ -168,9 +167,61 @@ measure() {
 measure src/cloud/itonami/app/server_main.kotoba "$root/target/amu/server_main.wasm"
 measure src/cloud/itonami/app/mcp_main.kotoba "$root/target/amu/mcp_main.wasm"
 
+# Native CLI emits no .provenance.edn beside the artifact; record the
+# verified emit (exit 0 + :compile/emitted + file on disk, all asserted
+# above) honestly instead of faking amu-shaped provenance.
+python3 - "$root" <<'EOF'
+import hashlib, sys, time
+root = sys.argv[1]
+cli = open(root + "/target/kotoba-cli/kotoba", "rb").read()
+cli_sha = hashlib.sha256(cli).hexdigest()
+for name in ("server_main.wasm", "mcp_main.wasm"):
+    out = root + "/target/amu/" + name
+    data = open(out, "rb").read()
+    prov = """{:kotoba.cli/code :compile/emitted
+ :entry "src/cloud/itonami/app/%s.kotoba"
+ :target :wasm
+ :output "%s"
+ :bytes %d
+ :output-sha256 "%s"
+ :emitter :native
+ :emitter-path "%s/target/kotoba-cli/kotoba"
+ :emitter-sha256 "%s"
+ :emitter-version "v0.7.3"
+ :emitter-runtime "native-jvm-free"
+ :emitted-at-ms %d
+ :note "native-CLI interim emit; amu-JS emitter dead (see PR #461)}
+""" % (name[:-5], out, len(data), hashlib.sha256(data).hexdigest(),
+       root, cli_sha, int(time.time() * 1000))
+    open(out + ".provenance.edn", "w").write(prov)
+    print("wrote %s.provenance.edn (%d bytes artifact)" % (out, len(data)))
+EOF
+
+# The amu-JS compile-amu path is dead (see the emitter note above) and is
+# not called. Sealed-KEXE emit was amu-only and has no consumer in CI
+# (windows smoke loads wasm); it stays out of this job until a native
+# KEXE path exists.
+for artifact in server_main.wasm mcp_main.wasm; do
+  path="$root/target/amu/$artifact"
+  if [[ ! -s "$path" ]]; then
+    echo "missing or empty artifact: $path" >&2
+    exit 1
+  fi
+  if [[ ! -s "$path.provenance.edn" ]]; then
+    echo "missing provenance: $path.provenance.edn" >&2
+    exit 1
+  fi
+  echo "ok artifact $(wc -c < "$path") bytes $artifact"
+done
+
+if [[ ! -s "$root/target/amu/browser-host.mjs" ]]; then
+  echo "browser-host.mjs was not copied next to the artifacts" >&2
+  exit 1
+fi
+
 CLOUD_ITONAMI_PORT="${CLOUD_ITONAMI_PORT:-17338}"
 export CLOUD_ITONAMI_PORT
 kbb --backend sci --classpath bin scripts/verify-no-java
 
-echo "ci-jvm-free-emit: ok (kexe verify Linux remains HOLD; not faked)"
+echo "ci-jvm-free-emit: ok (native v0.7.3 emit; sealed KEXE out of scope interim)"
 echo "ci-jvm-free-emit: bin/kotoba adapter :compile/emitted is not production kotoba v0.6.29"

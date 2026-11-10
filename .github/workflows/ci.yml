@@ -48,7 +48,9 @@ jobs:
       - name: JVM-free emit + guest load (no java/clojure)
         run: bash scripts/ci-jvm-free-emit
         # No actions/setup-java. PATH is reconstructed without java/clojure.
-        # kexe verify on Linux is HOLD and must not be faked as :ok.
+        # Emitter is the pinned native kotoba CLI (owner-approved interim;
+        # amu-JS is dead). Sealed-KEXE emit stays out until a native KEXE
+        # path exists; it must not be faked as :ok.
         # bin/kotoba is this app's compile adapter, not production kotoba v0.6.29.
 
 
