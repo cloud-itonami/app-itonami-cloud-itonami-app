@@ -39,3 +39,4 @@ jobs:
 # 2026-11-10: retrigger after sheets/forms/slides bump (dead transit).
 # 2026-11-10: retrigger after kagi/kotobase bump (dead security).
 # 2026-11-10: retrigger after override-deps + old-pin advance.
+# 2026-11-10: retrigger after :ci-lock alias fix.
