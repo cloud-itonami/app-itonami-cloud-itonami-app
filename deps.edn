@@ -90,10 +90,10 @@
         ;; supplied through the chain profile.
         io.github.kotoba-lang/inga
         {:git/url "https://github.com/kotoba-lang/inga.git"
-         :git/sha "cb87cdb38d73e24e9ec0c454360c3fa80a323cc5"}
+         :git/sha "10bbca4d1fc2c6d8e5717c85216007022ed17b5e"}
         io.github.kotoba-lang/inga-node
         {:git/url "https://github.com/kotoba-lang/inga-node.git"
-         :git/sha "125d80e062f3aee80c730fe24d170fb3fc55f775"}
+         :git/sha "870f8b0298780c2d81b6c7d75327c1ff2b5c53c7"}
         ;; The command surface -- cloud.itonami.app.commands / .repo-profile
         ;; and the three tables (commands.edn, cli-aliases.edn, defaults.edn).
         ;; Moved out on 2026-09-15 so the CLI, the mobile bundle and this app
