@@ -1,0 +1,38 @@
+#!/bin/bash
+# TEMPORARY probe: learn the native amu CLI contract for the port.
+# Never fails the job; prints everything. Revert before merge.
+set -u
+root="$1"
+probe_dir="$root/target/native-probe"
+mkdir -p "$probe_dir"
+bin="$probe_dir/amu-linux-x86_64"
+if [[ ! -x "$bin" ]]; then
+  curl -sL --max-time 300 "https://raw.githubusercontent.com/kotoba-lang/amu/HEAD/bin/amu-linux-x86_64" -o "$bin"
+  chmod +x "$bin"
+fi
+echo "probe: binary bytes $(wc -c < "$bin") sha256 $(sha256sum "$bin" | cut -d' ' -f1)"
+file "$bin" || true
+echo "probe: no-args exit:"
+"$bin" </dev/null >/tmp/probe-noargs.out 2>&1; echo "exit=$?"
+head -c 2000 /tmp/probe-noargs.out; echo
+for entry in src/cloud/itonami/app/server_main.kotoba src/cloud/itonami/app/mcp_main.kotoba; do
+  base="$(basename "$entry" .kotoba)"
+  for target in wasm32-browser wasm32; do
+    out="$probe_dir/$base.$target.wasm"
+    echo "probe: compile $base --target $target"
+    timeout 120 "$bin" compile "$root/$entry" --target "$target" --output "$out" >/tmp/probe-c.out 2>&1; echo "exit=$?"
+    head -c 1500 /tmp/probe-c.out; echo
+    ls -l "$out" 2>/dev/null || echo "probe: no output file"
+  done
+  echo "probe: check $base"
+  timeout 120 "$bin" check "$root/$entry" >/tmp/probe-check.out 2>&1; echo "exit=$?"
+  head -c 1500 /tmp/probe-check.out; echo
+done
+for target in aarch64-macos x86_64-linux; do
+  out="$probe_dir/server_main.$target.bin"
+  echo "probe: native $target"
+  timeout 180 "$bin" compile "$root/src/cloud/itonami/app/server_main.kotoba" --target "$target" --output "$out" >/tmp/probe-n.out 2>&1; echo "exit=$?"
+  head -c 800 /tmp/probe-n.out; echo
+  ls -l "$out" 2>/dev/null || echo "probe: no output file"
+done
+echo "probe: done (never fails)"
