@@ -40,3 +40,4 @@ jobs:
 # 2026-11-10: retrigger after kagi/kotobase bump (dead security).
 # 2026-11-10: retrigger after override-deps + old-pin advance.
 # 2026-11-10: retrigger after :ci-lock alias fix.
+# 2026-11-10: retrigger after lawfirm-split overrides.
