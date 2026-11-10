@@ -968,7 +968,42 @@
     io.github.kotoba-lang/osaho
          {:git/url "https://github.com/kotoba-lang/kotoba.git"
           :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
-          :deps/root "lib/kotoba.osaho"}}}
+          :deps/root "lib/kotoba.osaho"}
+    ;; kotoba@v0.6.29 bare-sha coords (URL inferred from the lib name) and
+    ;; commands@9bd4ec8 name deleted datom/ed25519/kotoba-script/
+    ;; kotoba-selfhost-contracts/org-ietf-cbor/org-w3-did/text. The app
+    ;; requires ed25519.core (provided by org.ietf.ed25519) and the
+    ;; io-multiformats/cbor floors already select monorepo copies; these
+    ;; overrides stop the losing-candidate clones. Amu refs in the two
+    ;; contract targets are test-only (verified positions).
+    io.github.kotoba-lang/datom
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.datom"}
+    io.github.kotoba-lang/ed25519
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/org.ietf.ed25519"}
+    io.github.kotoba-lang/kotoba-script
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.kotobaScript"}
+    io.github.kotoba-lang/kotoba-selfhost-contracts
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.kotobaSelfhostContracts"}
+    io.github.kotoba-lang/org-ietf-cbor
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/org.ietf.cbor"}
+    io.github.kotoba-lang/org-w3-did
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/org.w3.did"}
+    io.github.kotoba-lang/text
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.text"}}}
  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.8"}}
           :ns-default build}
   :release-sign {:extra-paths ["dev"]
