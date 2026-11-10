@@ -19,10 +19,11 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - name: Install Clojure CLI
+      - name: Install Clojure CLI and bb
         uses: DeLaGuardo/setup-clojure@13
         with:
           cli: latest
+          bb: latest
       - name: Install nbb host
         run: npm ci
       - name: Regenerate deps-lock.edn
