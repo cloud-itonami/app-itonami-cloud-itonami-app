@@ -1030,7 +1030,14 @@
     io.github.kotoba-lang/xml
          {:git/url "https://github.com/kotoba-lang/kotoba.git"
           :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
-          :deps/root "lib/kotoba.xml"}}}
+          :deps/root "lib/kotoba.xml"}
+    ;; Same class, git-vs-local: docs carries a :local/root ooxml while
+    ;; inga's b94158fd subtree names ooxml as git. Uncomparable; a single
+    ;; git coordinate wins (manifest is local-only).
+    io.github.kotoba-lang/ooxml
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.ooxml"}}}
  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.8"}}
           :ns-default build}
   :release-sign {:extra-paths ["dev"]
