@@ -1,6 +1,8 @@
 name: regen-lock-temp
 on:
-  workflow_dispatch:
+  push:
+    branches: [cdci-manual-trigger]
+    paths: [.github/workflows/regen-lock-temp.yml]
 permissions:
   contents: read
 jobs:
