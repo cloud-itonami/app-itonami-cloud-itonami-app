@@ -37,3 +37,4 @@ jobs:
 # 2026-11-10: retrigger after drive bump (dead bytes.git via drive@20f6f49).
 # 2026-11-10: retrigger after registry bump (dead connector via com-slack/com-notion).
 # 2026-11-10: retrigger after sheets/forms/slides bump (dead transit).
+# 2026-11-10: retrigger after kagi/kotobase bump (dead security).
