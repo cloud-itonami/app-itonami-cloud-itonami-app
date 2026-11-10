@@ -86,7 +86,7 @@
   (let [root (.resolve node-path (or (first args) "."))
         deps-file (.join node-path root "deps.edn")
         _ (when-not (.existsSync fs deps-file) (fail! (str "no deps.edn at " root)))
-        result (.spawnSync child "clojure" #js ["-Spath"]
+        result (.spawnSync child "clojure" #js ["-Spath" "-A:ci-lock"]
                            #js {:cwd root :encoding "utf8" :maxBuffer 16777216})
         _ (when-not (and (not (.-error result)) (zero? (or (.-status result) 1)))
             (fail! (str "clojure -Spath failed; this script needs a JDK.\n"

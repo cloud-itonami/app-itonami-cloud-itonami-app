@@ -841,25 +841,26 @@
          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioFilecoinTransport"}}
 
- ;; Graph-wide dead-URL overrides. A top-level :deps floor only wins version
- ;; selection -- tools.deps still clones every losing candidate URL, so a
- ;; deleted split repo fails resolution closed even when floored. An
- ;; :override-deps entry REPLACES the coordinate everywhere it is named, so
- ;; the dead URL is never fetched. Add here (top level: the lock regen runs
- ;; `clojure -Spath` with no aliases) when a reachable manifest names a
- ;; deleted split. Precedent: :product-kir-gen's osaho/io-multiformats/io-ipld.
- :override-deps
- {;; kotobase@HEAD still names deleted kotobase-engine.git (404). The app
-  ;; uses kotobase.local/store only (neither requires kotobase.engine.*),
-  ;; and the monorepo carries the same namespace family, so even
-  ;; kotobase.core keeps resolving.
-  io.github.kotoba-lang/kotobase-engine
-        {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
-         :deps/root "lib/kotoba.kotobaseEngineContract"}}
-
  :aliases
- {:build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.8"}}
+ {;; Lock-regen resolution overrides. A top-level :deps floor only wins
+  ;; version selection -- tools.deps still clones every losing candidate
+  ;; URL, and a project-top-level :override-deps is IGNORED (measured
+  ;; 2026-11-10: engine.git still cloned), so dead-split replacement lives
+  ;; in this alias and the lock regen runs `clojure -Spath -A:ci-lock`.
+  ;; An alias :override-deps entry REPLACES the coordinate everywhere it is
+  ;; named, so the dead URL is never fetched. Precedent: :product-kir-gen's
+  ;; osaho/io-multiformats/io-ipld.
+  :ci-lock
+  {:override-deps
+   {;; kotobase@HEAD still names deleted kotobase-engine.git (404). The app
+    ;; uses kotobase.local/store only (neither requires kotobase.engine.*),
+    ;; and the monorepo carries the same namespace family, so even
+    ;; kotobase.core keeps resolving.
+    io.github.kotoba-lang/kotobase-engine
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.kotobaseEngineContract"}}}
+ :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.8"}}
           :ns-default build}
   :release-sign {:extra-paths ["dev"]
                  :main-opts ["-m" "cloud.itonami.app.sign-update-manifest"]}
