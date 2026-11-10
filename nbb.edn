@@ -108,69 +108,18 @@
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
          :deps/root "lib/gov.nist.sha2"}
-        ;; Explicit floors for amu@09f4dcd (reached via inga@10bbca4): its
-        ;; top-level :deps still names the pre-monorepo split repos
-        ;; (kotoba-hir.git, security.git, abi.git, ...), all 404 since the
-        ;; split repos were removed. Without top-level floors stock bb dies
-        ;; cloning each one. All floors track the app monorepo pin 7e1dbe0a.
-        io.github.kotoba-lang/abi
-        {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
-         :deps/root "lib/kotoba.abi"}
-        io.github.kotoba-lang/artifact
-        {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
-         :deps/root "lib/kotoba.artifact"}
-        io.github.kotoba-lang/kotoba-codegen
-        {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
-         :deps/root "lib/kotoba.kotobaCodegen"}
-        io.github.kotoba-lang/kotoba-component
-        {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
-         :deps/root "lib/kotoba.kotobaComponent"}
-        io.github.kotoba-lang/kotoba-core-contracts
-        {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
-         :deps/root "lib/kotoba.kotobaCoreContracts"}
-        io.github.kotoba-lang/kotoba-gmir
-        {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
-         :deps/root "lib/kotoba.kotobaGmir"}
-        io.github.kotoba-lang/kotoba-hir
-        {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
-         :deps/root "lib/kotoba.kotobaHir"}
-        io.github.kotoba-lang/kotoba-mir
-        {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
-         :deps/root "lib/kotoba.kotobaMir"}
-        io.github.kotoba-lang/kotoba-object
-        {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
-         :deps/root "lib/kotoba.kotobaObject"}
-        io.github.kotoba-lang/kotoba-script
-        {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
-         :deps/root "lib/kotoba.kotobaScript"}
-        io.github.kotoba-lang/kotoba-verifier
-        {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
-         :deps/root "lib/kotoba.kotobaVerifier"}
-        io.github.kotoba-lang/kotoba-wasm
-        {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
-         :deps/root "lib/kotoba.kotobaWasm"}
-        io.github.kotoba-lang/security
-        {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
-         :deps/root "lib/kotoba.security"}
         ;; kotoba.image and org.w3.png both name org-ietf-deflate as a sibling
         ;; :local/root (LOCAL-VS-LOCAL); the top-level floor wins outright.
         io.github.kotoba-lang/org-ietf-deflate
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
          :deps/root "lib/org.ietf.deflate"}
+        ;; NOTE (2026-11-10): top-level floors CANNOT fix 404-URL transitives.
+        ;; tools.deps clones every candidate URL before choosing, so a floor
+        ;; for abi/artifact/... only EXPANDS another dead manifest (measured:
+        ;; the artifact floor introduced the abi.git clone). Dead split-repo
+        ;; URLs must be fixed at the manifest that names them (kotoba-lang/
+        ;; kotoba lib/kotoba.security still names kotoba-core-contracts.git).
         ;; Embedded DNSSEC validation for Awai domain binding TXT proofs.
         ;; Pin a release after CVE-2024-25638 and KeyTrap fixes.
         dnsjava/dnsjava {:mvn/version "3.6.5"}
