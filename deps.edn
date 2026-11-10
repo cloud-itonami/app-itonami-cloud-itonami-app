@@ -330,11 +330,11 @@
          :deps/root "lib/kotoba.comMicrosoftGraph"}
   io.github.kotoba-lang/com-slack
   {:git/url "https://github.com/cloud-itonami/itonami-registry.git"
-   :git/sha "72ddcbad097f921ee4fecef39528419133e91494"
+   :git/sha "d4fcfcdced8678d24ab747edc46f5f3acd6f823d"
    :deps/root "compat/com-slack"}
   io.github.kotoba-lang/com-notion
   {:git/url "https://github.com/cloud-itonami/itonami-registry.git"
-   :git/sha "3f3f3ea9361d0602224ebdd2aeb1baa874c0bb40"
+   :git/sha "d4fcfcdced8678d24ab747edc46f5f3acd6f823d"
    :deps/root "compat/com-notion"}
   io.github.kotoba-lang/com-google-chat
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
@@ -785,7 +785,7 @@
   ;; app already used, is unchanged by that commit.
   io.github.kotoba-lang/com-github
   {:git/url "https://github.com/cloud-itonami/itonami-registry.git"
-   :git/sha "37cd0ef7984521aa85f4a4e354f2069bc1653e01"
+   :git/sha "d4fcfcdced8678d24ab747edc46f5f3acd6f823d"
    :deps/root "compat/com-github"}
   ;; Durable organizational roles and desired-capacity reconciliation. Kanban
   ;; work in this app supplies goals; yakuwari remains the authority for how
