@@ -28,10 +28,13 @@ jobs:
       # filters java|javac|clojure|clj. Fixes the 2026-09-15..18 CI red streak
       # (/bin/sh: 1: bb: not found, exit 127) that silently skipped
       # windows-launch-smoke via `needs`.
+      # Pinned: bb 1.13.x regresses git-deps resolution (tries the
+      # default io.github.kotoba-lang/io URL despite the nbb.edn
+      # :git/url override; 1.12.218 resolves the same set cleanly).
       - name: Install babashka (bb) for the engine's deps download
         uses: DeLaGuardo/setup-clojure@13
         with:
-          bb: latest
+          bb: 1.12.218
       - name: Install nbb host
         run: npm ci
       - name: Human approval contract (host fixture)
@@ -125,10 +128,13 @@ jobs:
         run: npm ci
       # The engine's lib/nbb_deps.js also invokes `bb` on Windows; install it
       # here too so the smoke does not fail on a missing bb.
+      # Pinned: bb 1.13.x regresses git-deps resolution (tries the
+      # default io.github.kotoba-lang/io URL despite the nbb.edn
+      # :git/url override; 1.12.218 resolves the same set cleanly).
       - name: Install babashka (bb) for the engine's deps download
         uses: DeLaGuardo/setup-clojure@13
         with:
-          bb: latest
+          bb: 1.12.218
       - name: Install kbb launcher + engine (pinned)
         shell: bash
         run: |
