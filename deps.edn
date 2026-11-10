@@ -611,14 +611,14 @@
   ;; which is the same arrangement as the object stores above.
   io.github.kotoba-lang/sheets
   {:git/url "https://github.com/kotoba-lang/sheets.git"
-   :git/sha "30f4737647c75baa9c1e11194dabb3b25c8d212f"}
+   :git/sha "6036ed4b367b85324d44bd5c4b183e133c38c67e"}
   io.github.kotoba-lang/docs
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.docs"}
   io.github.kotoba-lang/forms
   {:git/url "https://github.com/kotoba-lang/forms.git"
-   :git/sha "142c34d76d21e982586ac6be83a274be7438bbcc"}
+   :git/sha "c7242bd0778e4c6eef9de69c48e72b71e5904cd9"}
   ;; The fourth surface. Heavier than its siblings — it brings office, ooxml,
   ;; drawingml, presentationml, office-style, canvaskit, css, xml and the
   ;; kotoba-ui stack, because `slides` is also a Pages application and not
@@ -627,7 +627,7 @@
   ;; not code that runs.
   io.github.kotoba-lang/slides
   {:git/url "https://github.com/kotoba-lang/slides.git"
-   :git/sha "a7cf5a6bc0b7c5813fc6291f96754d3b8784af39"}
+   :git/sha "80fd4a238c1cb4b271c46532efd84ae3940e2522"}
   ;; Named directly even though all three now agree on it. They agree because
   ;; sheets and docs were advanced off 77e3ce7d for the rehydrate work; before
   ;; that they pinned the last commit before the wire moved to plain JSON and
