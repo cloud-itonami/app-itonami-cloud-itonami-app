@@ -726,7 +726,7 @@
   ;; cancellation procedure goes stale without saying so.
   io.github.kotoba-lang/kagi
   {:git/url "https://github.com/kotoba-lang/kagi.git"
-   :git/sha "7d9467db6382d26fa1c5f9cac719b7c6fc788e7f"}
+   :git/sha "38697760c91951d3f81a0f06169ae7058d4afd39"}
   ;; Local Datomic-shaped query/materialized view for the Agent. Persistence
   ;; remains an injected append/read port; queries never move to the remote.
   ;; 3578f28 makes `langchain.edn-persist` `.cljc`: policy plus an injected
@@ -900,7 +900,38 @@
     io.github.kotoba-lang/shitsuke
          {:git/url "https://github.com/kotoba-lang/kotoba.git"
           :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
-          :deps/root "lib/kotoba.shitsuke"}}}
+          :deps/root "lib/kotoba.shitsuke"}
+    ;; yotei/dds name deleted jp-go (404); kekkai-node names deleted bytes/
+    ;; noise/org-ietf-dns (404); shinkansen split is deleted too (floored at
+    ;; top level, which cannot stop the losing-candidate clone). Targets
+    ;; verified present at the app pin; amu refs inside are test-only.
+    io.github.kotoba-lang/jp-go-digital-design-system
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.jpGoDigitalDesignSystem"}
+    io.github.kotoba-lang/shinkansen
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.shinkansen"}
+    io.github.kotoba-lang/bytes
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.bytes"}
+    io.github.kotoba-lang/noise
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.noise"}
+    io.github.kotoba-lang/org-ietf-dns
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/org.ietf.dns"}
+    ;; kagi@3869776 (restored: HEAD dropped its root manifest) still names
+    ;; deleted security.git. Same family exists in the monorepo; the app
+    ;; touches kagi.* only.
+    io.github.kotoba-lang/security
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.security"}}}
  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.8"}}
           :ns-default build}
   :release-sign {:extra-paths ["dev"]
