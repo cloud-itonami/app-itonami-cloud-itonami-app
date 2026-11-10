@@ -859,7 +859,48 @@
     io.github.kotoba-lang/kotobase-engine
          {:git/url "https://github.com/kotoba-lang/kotoba.git"
           :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
-          :deps/root "lib/kotoba.kotobaseEngineContract"}}}
+          :deps/root "lib/kotoba.kotobaseEngineContract"}
+    ;; lawfirm@8889aa0 still names these deleted splits (all 404). None is
+    ;; directly required by the app (lawfirm.workspace/store/actor only);
+    ;; the monorepo carries each namespace family. Amu refs inside these
+    ;; targets are :test-alias-only (verified positions), so they never
+    ;; enter resolution.
+    io.github.kotoba-lang/appkit
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.appkit"}
+    io.github.kotoba-lang/css
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.css"}
+    io.github.kotoba-lang/design-quality
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.designQuality"}
+    io.github.kotoba-lang/governor
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.governor"}
+    io.github.kotoba-lang/html
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.html"}
+    io.github.kotoba-lang/kotoba-ui
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.kotobaUi"}
+    io.github.kotoba-lang/langgraph
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.langgraph"}
+    io.github.kotoba-lang/liquid-glass-ui
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.liquidGlassUi"}
+    io.github.kotoba-lang/shitsuke
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.shitsuke"}}}
  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.8"}}
           :ns-default build}
   :release-sign {:extra-paths ["dev"]
