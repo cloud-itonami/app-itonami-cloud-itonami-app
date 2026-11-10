@@ -1003,7 +1003,13 @@
     io.github.kotoba-lang/text
          {:git/url "https://github.com/kotoba-lang/kotoba.git"
           :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
-          :deps/root "lib/kotoba.text"}}}
+          :deps/root "lib/kotoba.text"}
+    ;; kagi@3869776 {:sha}-form coord names deleted tech-ipfs-specs-ipns.
+    ;; Same-namespace monorepo target (local-only manifest).
+    io.github.kotoba-lang/tech-ipfs-specs-ipns
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.techIpfsSpecsIpns"}}}
  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.8"}}
           :ns-default build}
   :release-sign {:extra-paths ["dev"]
