@@ -60,3 +60,11 @@
   (let [response (respond (rpc 5 "resources/read" {"uri" "ui://no-such-app"}))]
     (is (= -32601 (get-in response ["error" "code"]))
         "non-UI uris keep the dispatcher behaviour")))
+
+(deftest discover-advertises-capabilities-with-extensions
+  (let [response (respond (rpc 6 "server/discover" {}))]
+    (is (= "cloud-itonami-fleet"
+           (get-in response ["result" "serverInfo" "name"])))
+    (is (= {"tools" {} "resources" {} "prompts" {} "extensions" {}}
+           (get-in response ["result" "capabilities"])))
+    "2026-07 clients discover extensions without initialize"))

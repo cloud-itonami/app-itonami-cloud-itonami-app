@@ -12,8 +12,9 @@
     entrypoint tool, so `itonami_open` takes no required params.
   - `initialize` advertises the surface under `capabilities.experimental`
     on MCP 2025-11-25, the same location the spec uses for
-    `openai/settings`. `server/discover` (MCP 2026-07) is not implemented;
-    see JUN-1050 for the follow-up.
+    `openai/settings`. `server/discover` (MCP 2026-07) answers with the
+    same `serverInfo` plus `capabilities.extensions` (empty until a
+    product extension needs declaring).
   - `resources/read` serves the UI resource as `text/html;profile=mcp-app`
     with `openai/ui.availableDisplayModes` (`inline`, `fullscreen`).
     Entrypoints render fullscreen; ChatGPT chooses the mode from this item.
@@ -68,6 +69,18 @@
        "<p><a href=\"http://127.0.0.1:1338\">Open the running app</a> · "
        "<a href=\"https://itonami.cloud\">Docs</a></p>"
        "</main></body></html>"))
+
+(defn discover-response
+  "The `server/discover` result: `serverInfo` plus capabilities with an
+  `extensions` location (empty until a product extension needs declaring),
+  mirroring the protocol kernel's 2026-07 shape."
+  [server-name server-version]
+  {"serverInfo" {"name" server-name
+                 "version" server-version}
+   "capabilities" {"tools" {}
+                   "resources" {}
+                   "prompts" {}
+                   "extensions" {}}})
 
 (defn read-response
   "The `resources/read` result for our UI uri, or nil when the uri is not
