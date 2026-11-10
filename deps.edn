@@ -541,9 +541,13 @@
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.w3.png"}
+  ;; 2026-11-10: bump 20f6f49 -> 89874bdf (drive main dropped the deleted
+  ;; kotoba-lang/bytes.git split for monorepo lib/kotoba.bytes; the stale
+  ;; bytes.git URL failed the lock regen closed). Namespaces verified
+  ;; identical at HEAD: drive/object, drive/workspace, drive/store/fs.
   io.github.kotoba-lang/drive
   {:git/url "https://github.com/kotoba-lang/drive.git"
-   :git/sha "20f6f4940a60061b692aa53ae501e2d36f8bf010"}
+   :git/sha "89874bdf1bbb4a9729b57742b8193f56151a6184"}
   ;; Client-side Drive encryption. Object stores receive only ciphertext
   ;; packages; sharing adds recipient key wraps without touching the chunks.
   io.github.kotoba-lang/envelope

@@ -33,3 +33,5 @@ jobs:
         with:
           name: deps-lock-edn
           path: deps-lock.edn
+
+# 2026-11-10: retrigger after drive bump (dead bytes.git via drive@20f6f49).
