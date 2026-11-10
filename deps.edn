@@ -106,6 +106,14 @@
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.cbor"}
+        io.github.kotoba-lang/arrangement
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.arrangement"}
+        io.github.kotoba-lang/kotobase-storage
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.kotobaseStorage"}
         io.github.kotoba-lang/org-ietf-deflate
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"

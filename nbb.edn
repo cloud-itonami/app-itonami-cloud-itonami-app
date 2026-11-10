@@ -116,6 +116,18 @@
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.cbor"}
+        ;; inga@10bbca4 names arrangement + kotobase-storage as monorepo git
+        ;; coords while inga-core@c59d8fd4 (also via inga) names them as
+        ;; sibling :local/roots (GIT-VS-LOCAL); the top-level floors win
+        ;; outright. Both floor manifests are local-only at this pin.
+        io.github.kotoba-lang/arrangement
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.arrangement"}
+        io.github.kotoba-lang/kotobase-storage
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.kotobaseStorage"}
         ;; kotoba.image and org.w3.png both name org-ietf-deflate as a sibling
         ;; :local/root (LOCAL-VS-LOCAL); the top-level floor wins outright.
         io.github.kotoba-lang/org-ietf-deflate
