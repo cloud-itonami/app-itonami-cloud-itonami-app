@@ -98,6 +98,16 @@
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
          :deps/root "lib/org.ietf.ed25519"}
+        ;; Explicit floor: org.ietf.ed25519 names org-nist-sha2 as a sibling
+        ;; :local/root while inga-node@870f8b0 names it as a git coord.
+        ;; tools.deps cannot compare git-vs-local transitives, so without a
+        ;; top-level floor the emit dies at 'Unable to compare versions for
+        ;; io.github.kotoba-lang/org-nist-sha2'. A top-level dep always wins
+        ;; outright (measured 2026-11-10, bb 1.12.218 + 1.13.229).
+        io.github.kotoba-lang/org-nist-sha2
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/gov.nist.sha2"}
         ;; Embedded DNSSEC validation for Awai domain binding TXT proofs.
         ;; Pin a release after CVE-2024-25638 and KeyTrap fixes.
         dnsjava/dnsjava {:mvn/version "3.6.5"}

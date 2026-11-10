@@ -94,6 +94,14 @@
         io.github.kotoba-lang/inga-node
         {:git/url "https://github.com/kotoba-lang/inga-node.git"
          :git/sha "870f8b0298780c2d81b6c1757c2777553b7d1322"}
+        ;; Explicit floor (keep aligned with nbb.edn): org.ietf.ed25519 names
+        ;; org-nist-sha2 as a sibling :local/root while inga-node@870f8b0
+        ;; names it as a git coord. tools.deps cannot compare git-vs-local
+        ;; transitives, so the top-level floor wins outright.
+        io.github.kotoba-lang/org-nist-sha2
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/gov.nist.sha2"}
         ;; The command surface -- cloud.itonami.app.commands / .repo-profile
         ;; and the three tables (commands.edn, cli-aliases.edn, defaults.edn).
         ;; Moved out on 2026-09-15 so the CLI, the mobile bundle and this app
