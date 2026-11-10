@@ -89,6 +89,22 @@ jobs:
         run: npm test
         working-directory: deploy/awai-public-gateway
 
+  # The nbb host entrypoint surface (JUN-1062) and the Agent Plugins
+  # packaging (JUN-1064) are pinned by node --test files that no other
+  # job runs (PR #458 landed with zero checks). The host is driven
+  # through a symlink so nbb resolves config from the script path.
+  node-host-ui-packaging:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install repo-pinned nbb
+        run: npm ci --no-audit --no-fund
+      - name: Test nbb host entrypoint + plugin packaging
+        run: NBB=$PWD/node_modules/.bin/nbb node --test test/itonami-mcp-ui.test.mjs test/plugin-packaging.test.mjs
+
   # Smoke-tests the Windows launch path end to end: kbb + engine + guest-wasm
   # server, first-boot health on 1338. This is the run path the resident
   # actually uses since adr-2609112000. The OLD smoke ran the JVM uberjar;
