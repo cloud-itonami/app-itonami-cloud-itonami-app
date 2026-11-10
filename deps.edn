@@ -102,6 +102,65 @@
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
          :deps/root "lib/gov.nist.sha2"}
+        ;; Explicit floors (keep aligned with nbb.edn): amu@09f4dcd, reached
+        ;; via inga@10bbca4, still names the removed pre-monorepo split repos
+        ;; in its top-level :deps. All floors track the app monorepo pin.
+        io.github.kotoba-lang/abi
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/kotoba.abi"}
+        io.github.kotoba-lang/artifact
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/kotoba.artifact"}
+        io.github.kotoba-lang/kotoba-codegen
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/kotoba.kotobaCodegen"}
+        io.github.kotoba-lang/kotoba-component
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/kotoba.kotobaComponent"}
+        io.github.kotoba-lang/kotoba-core-contracts
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/kotoba.kotobaCoreContracts"}
+        io.github.kotoba-lang/kotoba-gmir
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/kotoba.kotobaGmir"}
+        io.github.kotoba-lang/kotoba-hir
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/kotoba.kotobaHir"}
+        io.github.kotoba-lang/kotoba-mir
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/kotoba.kotobaMir"}
+        io.github.kotoba-lang/kotoba-object
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/kotoba.kotobaObject"}
+        io.github.kotoba-lang/kotoba-script
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/kotoba.kotobaScript"}
+        io.github.kotoba-lang/kotoba-verifier
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/kotoba.kotobaVerifier"}
+        io.github.kotoba-lang/kotoba-wasm
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/kotoba.kotobaWasm"}
+        io.github.kotoba-lang/security
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/kotoba.security"}
+        io.github.kotoba-lang/org-ietf-deflate
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :deps/root "lib/org.ietf.deflate"}
         ;; The command surface -- cloud.itonami.app.commands / .repo-profile
         ;; and the three tables (commands.edn, cli-aliases.edn, defaults.edn).
         ;; Moved out on 2026-09-15 so the CLI, the mobile bundle and this app
