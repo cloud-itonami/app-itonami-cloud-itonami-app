@@ -200,6 +200,14 @@
         "ping"
         (result id {})
 
+        "server/discover"
+        (result id {"serverInfo" {"name" server-name
+                                 "version" server-version}
+                    "capabilities" {"tools" {}
+                                    "resources" {}
+                                    "prompts" {}
+                                    "extensions" {}}})
+
         "tools/list"
         (result id {"tools" (conj (mapv (fn [t]
                                           {"name" (:name t)

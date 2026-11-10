@@ -212,7 +212,10 @@
   ([configuration request protocol-version]
    (when (contains? request "id")
      (let [method (get request "method")]
-       (if (= "resources/read" method)
+       (if (= "server/discover" method)
+         {"jsonrpc" "2.0" "id" (get request "id")
+          "result" (ui/discover-response server-name server-version)}
+         (if (= "resources/read" method)
          (if-let [result (ui/read-response (get-in request ["params" "uri"]))]
            {"jsonrpc" "2.0" "id" (get request "id") "result" result}
            (execute/handle (ports configuration)
@@ -225,7 +228,7 @@
                  (= "tools/list" method)
                  (enrich-tools-list response)
 
-                 :else response)))))))
+                 :else response))))))))
 
 (defn- write-line! [writer value]
   (.write writer (json/write-str value))

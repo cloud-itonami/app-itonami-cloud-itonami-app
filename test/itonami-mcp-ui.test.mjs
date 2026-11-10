@@ -62,3 +62,15 @@ test('nbb host carries the Codex entrypoint surface (JUN-1062)', () => {
 
   assert.equal(missing.error.code, -32601);
 });
+
+test('nbb host answers server/discover (MCP 2026-07)', () => {
+  const [discovered] = drive([rpc(1, 'server/discover', {})]);
+
+  assert.equal(discovered.result.serverInfo.name, 'cloud-itonami-fleet');
+  assert.deepEqual(discovered.result.capabilities, {
+    tools: {},
+    resources: {},
+    prompts: {},
+    extensions: {},
+  });
+});
