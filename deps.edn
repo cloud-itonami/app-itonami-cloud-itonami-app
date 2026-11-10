@@ -114,6 +114,18 @@
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.kotobaseStorage"}
+        io.github.kotoba-lang/prolly-tree
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.prollyTree"}
+        io.github.kotoba-lang/datalog
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.datalog"}
+        io.github.kotoba-lang/datom-source
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.datomSource"}
         io.github.kotoba-lang/org-ietf-deflate
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
