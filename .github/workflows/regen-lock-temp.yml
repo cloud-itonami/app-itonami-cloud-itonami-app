@@ -46,3 +46,4 @@ jobs:
 # 2026-11-10: retrigger after ed25519/osaho + kaiyaku.
 # 2026-11-10: retrigger after bare-sha batch.
 # 2026-11-10: retrigger after ipns override.
+# 2026-11-10: retrigger after io-filecoin override.
