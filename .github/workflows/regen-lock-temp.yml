@@ -59,3 +59,4 @@ jobs:
 # 2026-11-10: retrigger after nquads/xml overrides.
 # 2026-11-10: retrigger after ooxml override.
 # 2026-11-10: retrigger after x25519 override.
+# 2026-11-10: retrigger after office-stack overrides.
