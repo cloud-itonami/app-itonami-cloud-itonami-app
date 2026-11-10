@@ -124,4 +124,4 @@
          :git/sha "10bbca4d1fc2c6d8e5717c85216007022ed17b5e"}
         io.github.kotoba-lang/inga-node
         {:git/url "https://github.com/kotoba-lang/inga-node.git"
-         :git/sha "870f8b0298780c2d81b6c7d75327c1ff2b5c53c7"}}}
+         :git/sha "870f8b0298780c2d81b6c1757c2777553b7d1322"}}}
