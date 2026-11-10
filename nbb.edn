@@ -108,6 +108,14 @@
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/gov.nist.sha2"}
+        ;; osaho, io-ipld (and security) each name org-ietf-cbor as a sibling
+        ;; :local/root (LOCAL-VS-LOCAL across different checkouts); the
+        ;; top-level floor wins outright (verified 2026-11-10 with a minimal
+        ;; file:// reproduction: top git + two different-path locals is green).
+        io.github.kotoba-lang/org-ietf-cbor
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/org.ietf.cbor"}
         ;; kotoba.image and org.w3.png both name org-ietf-deflate as a sibling
         ;; :local/root (LOCAL-VS-LOCAL); the top-level floor wins outright.
         io.github.kotoba-lang/org-ietf-deflate
