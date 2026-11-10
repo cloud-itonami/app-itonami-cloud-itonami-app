@@ -1,0 +1,32 @@
+name: regen-lock-temp
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regen-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: cdci-manual-trigger
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install Clojure CLI
+        uses: DeLaGuardo/setup-clojure@13
+        with:
+          clojure: latest
+      - name: Install nbb host
+        run: npm ci
+      - name: Regenerate deps-lock.edn
+        run: ./node_modules/.bin/nbb scripts/lock-classpath.cljs .
+      - name: Upload regenerated lock
+        uses: actions/upload-artifact@v4
+        with:
+          name: deps-lock-edn
+          path: deps-lock.edn

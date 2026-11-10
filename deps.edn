@@ -246,13 +246,10 @@
   com.fasterxml.jackson.dataformat/jackson-dataformat-cbor
   {:mvn/version "2.22.1"}
 
-  ;; Shared authentication vocabulary and default-deny authorization decision
-  ;; engine. Email uses the focused module so unrelated factor adapters do not
-  ;; pull local-root development dependencies into this application.
-  io.github.kotoba-lang/authentication-email
-  {:git/url "https://github.com/kotoba-lang/authentication.git"
-   :git/sha "188eb0e6ff7c0bc5fc6de04ef7b3f36fef45d9b0"
-   :deps/root "modules/email"}
+  ;; authentication-email (split repo kotoba-lang/authentication, removed
+  ;; upstream) is dropped 2026-11-10: nothing in src/test/scripts requires
+  ;; it -- only deps.edn and the stale lock named it -- and its URL 404s,
+  ;; which fails closed every stock-tools.deps resolution of this file.
   io.github.kotoba-lang/authorization
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
