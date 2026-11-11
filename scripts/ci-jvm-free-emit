@@ -117,8 +117,8 @@ fi
 # Reconstruct PATH without java/clojure launchers.
 PATH="$("$root/scripts/path-without-jvm")"
 export PATH
-command -v java >/dev/null 2>&1 || echo "probe: no java on PATH"
-echo "probe: JAVA_HOME=${JAVA_HOME:-unset}"
+command -v java >/dev/null 2>&1 || echo "env: no java on PATH"
+echo "env: JAVA_HOME=${JAVA_HOME:-unset}"
 if command -v java >/dev/null 2>&1 || command -v clojure >/dev/null 2>&1; then
   echo "java/clojure still on PATH after filter" >&2
   exit 1
