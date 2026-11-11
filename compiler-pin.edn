@@ -39,4 +39,13 @@
  :kbb
  {:git/url "https://github.com/kotoba-lang/kotoba.git"
   :git/sha "a755ec25a07637bab9ab97edab1ab1257418c558"
-  :note "launcher pin only: the kbb cutover merge (adr-2609112000) where bin/kbb and the .cljk engine landed. v0.6.29 (42ae4941) predates bin/kbb and CANNOT serve it. Not a deps.edn runtime pin."}}
+  :note "launcher pin only: the kbb cutover merge (adr-2609112000) where bin/kbb and the .cljk engine landed. v0.6.29 (42ae4941) predates bin/kbb and CANNOT serve it. Not a deps.edn runtime pin."}
+ :kotoba-cli
+ {:release/url "https://github.com/kotoba-lang/kotoba/releases/download/v0.7.3/kotoba-linux-amd64.tar.gz"
+  :release/sha256 "6b14c81619cf019feed5ca8a295fb27db34883bbaca4a547e98a3db398e2e058"
+  :binary "kotoba"
+  :binary/sha256 "6ac2c81fbc8f26e7caad289791500d5209b8ae5275efee5e2076ab18c5f06656"
+  :version "v0.7.3"
+  :source/commit "d9c3c8d5eca2e7632a8a665fea0522f55dd46683"
+  :runtime "native-jvm-free"
+  :note "Owner-approved interim emit frontend (2026-11-10): amu-JS at :amu cannot load post-rename .cljk lib sources (nbb has no .cljk loader; pre-rename split .cljc blobs are deleted and unarchived), so no amu-JS emit of current entries is possible. v0.7.3 native CLI, runtime native-jvm-free, so the JVM-free job constraint holds. Not the v0.6.29 runtime pin; bin/kotoba still reports :not-production-kotoba-binary accordingly. :amu pin retained for browser-host.mjs."}}

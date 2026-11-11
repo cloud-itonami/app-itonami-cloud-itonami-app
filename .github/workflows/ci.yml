@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -27,10 +28,17 @@ jobs:
       # filters java|javac|clojure|clj. Fixes the 2026-09-15..18 CI red streak
       # (/bin/sh: 1: bb: not found, exit 127) that silently skipped
       # windows-launch-smoke via `needs`.
+      # Pinned to 1.13.229: the 2026-11-10 amu-jvm-free-emit red was NOT a bb
+      # regression (both 1.12.218 and 1.13.229 failed identically) but stale
+      # inga/inga-node pins whose deps.edn named sha-only coords and
+      # split-repo URLs for repos that no longer exist (io/coll/edn/text/
+      # test/kotobase-storage/kotobase-client/org-nist-sha2). Bumped to
+      # inga@10bbca4 + inga-node@870f8b0 (monorepo-sourced, kotoba-lang/
+      # inga#33 + inga-node#15); 1.13.229 verified against the fixed graph.
       - name: Install babashka (bb) for the engine's deps download
         uses: DeLaGuardo/setup-clojure@13
         with:
-          bb: latest
+          bb: 1.13.229
       - name: Install nbb host
         run: npm ci
       - name: Human approval contract (host fixture)
@@ -40,7 +48,9 @@ jobs:
       - name: JVM-free emit + guest load (no java/clojure)
         run: bash scripts/ci-jvm-free-emit
         # No actions/setup-java. PATH is reconstructed without java/clojure.
-        # kexe verify on Linux is HOLD and must not be faked as :ok.
+        # Emitter is the pinned native kotoba CLI (owner-approved interim;
+        # amu-JS is dead). Sealed-KEXE emit stays out until a native KEXE
+        # path exists; it must not be faked as :ok.
         # bin/kotoba is this app's compile adapter, not production kotoba v0.6.29.
 
 
@@ -117,6 +127,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      # bb's git checkouts hit monorepo maintenance paths deeper than
+      # Windows MAX_PATH (e.g. kotobaseEngineContract reviews). This only
+      # enables the OS long-path capability; it changes no content.
+      - name: Allow long paths for monorepo checkouts
+        run: git config --global core.longpaths true
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -124,10 +139,12 @@ jobs:
         run: npm ci
       # The engine's lib/nbb_deps.js also invokes `bb` on Windows; install it
       # here too so the smoke does not fail on a missing bb.
+      # Pinned to 1.13.229 (see the amu-jvm-free-emit note above: the red
+      # was stale inga/inga-node pins, not a bb regression).
       - name: Install babashka (bb) for the engine's deps download
         uses: DeLaGuardo/setup-clojure@13
         with:
-          bb: latest
+          bb: 1.13.229
       - name: Install kbb launcher + engine (pinned)
         shell: bash
         run: |

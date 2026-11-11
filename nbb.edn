@@ -9,43 +9,43 @@
         ;; and tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/process
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.process"}
         ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
         ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
         io.github.kotoba-lang/test
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.test"}
         ;; kotoba.image replaced java.awt.image.BufferedImage / javax.imageio here (2026-09-25).
         ;; An explicit floor: tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/image
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.image"}
         ;; kotoba.netcap.tls-host replaced javax.net.ssl here (2026-09-25). An explicit
         ;; floor: tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/netcap
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.netcap"}
         ;; kotoba.lang.error replaced clojure.lang.ExceptionInfo here (2026-09-25).
         ;; An explicit floor: tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/error
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.error"}
         ;; kotoba.http.form-urlencoded replaced java.net.URLEncoder/URLDecoder here
         ;; (2026-09-24). An explicit floor: tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/http-parse-url
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.http"}
         ;; kotoba.bytes replaced java.util.Base64 here (2026-09-24). An explicit
         ;; floor: tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/bytes
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.bytes"}
         ;; kotoba.io replaced clojure.java.io here (2026-09-24). An explicit floor:
         ;; kotoba.io carries clojure.java.io's file/as-file/as-relative-path/
@@ -53,51 +53,105 @@
         ;; sha it is shown.
         io.github.kotoba-lang/io
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.io"}
         ;; kotoba.json replaced clojure.data.json here (2026-09-24). An explicit
         ;; floor: kotoba.json/read-str and /write-str first exist at 9c11ad1, and
         ;; tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/json
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.json"}
         ;; kotoba.pprint replaced clojure.pprint here (2026-09-24): the same
         ;; bytes (cljs.pprint transcribed). An explicit floor; tools.deps takes the
         ;; NEWEST sha it is shown.
         io.github.kotoba-lang/pprint
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.pprint"}
         ;; kotoba.lang.edn replaced clojure.edn here (2026-09-23). An explicit floor:
         ;; tools.deps takes the NEWEST sha it is shown, and kbb resolves git deps
         ;; only from nbb.edn, so every project file this repo has names it.
         io.github.kotoba-lang/edn
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.edn"}
         ;; Shared Awai app install lock, update policy, capability consent, and
         ;; offline launch contract. Keep this mirrored with deps.edn: the
         ;; production server runs through Nbb and does not read deps.edn.
         io.github.kotoba-lang/kotoba-protocol
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.kotobaProtocol"}
         ;; Shared host content traversal for canonical DAG-CBOR and UnixFS
         ;; DAG-PB. Keep these pins in sync with deps.edn and the compiler hold.
         io.github.kotoba-lang/io-multiformats
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioMultiformats"}
         io.github.kotoba-lang/io-ipld
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioIpld"}
         ;; Portable Awai envelope signature verification for the Node host.
         io.github.kotoba-lang/org-ietf-ed25519
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.ed25519"}
+        ;; Explicit floor: org.ietf.ed25519 names org-nist-sha2 as a sibling
+        ;; :local/root while inga-node@870f8b0 names it as a git coord.
+        ;; tools.deps cannot compare git-vs-local transitives, so without a
+        ;; top-level floor the emit dies at 'Unable to compare versions for
+        ;; io.github.kotoba-lang/org-nist-sha2'. A top-level dep always wins
+        ;; outright (measured 2026-11-10, bb 1.12.218 + 1.13.229).
+        io.github.kotoba-lang/org-nist-sha2
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/gov.nist.sha2"}
+        ;; osaho, io-ipld (and security) each name org-ietf-cbor as a sibling
+        ;; :local/root (LOCAL-VS-LOCAL across different checkouts); the
+        ;; top-level floor wins outright (verified 2026-11-10 with a minimal
+        ;; file:// reproduction: top git + two different-path locals is green).
+        io.github.kotoba-lang/org-ietf-cbor
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/org.ietf.cbor"}
+        ;; inga@10bbca4 names arrangement + kotobase-storage as monorepo git
+        ;; coords while inga-core@c59d8fd4 (also via inga) names them as
+        ;; sibling :local/roots (GIT-VS-LOCAL); the top-level floors win
+        ;; outright. Both floor manifests are local-only at this pin.
+        io.github.kotoba-lang/arrangement
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.arrangement"}
+        io.github.kotoba-lang/kotobase-storage
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.kotobaseStorage"}
+        io.github.kotoba-lang/prolly-tree
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.prollyTree"}
+        io.github.kotoba-lang/datalog
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.datalog"}
+        io.github.kotoba-lang/datom-source
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.datomSource"}
+        ;; kotoba.image and org.w3.png both name org-ietf-deflate as a sibling
+        ;; :local/root (LOCAL-VS-LOCAL); the top-level floor wins outright.
+        io.github.kotoba-lang/org-ietf-deflate
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/org.ietf.deflate"}
+        ;; NOTE (2026-11-10): top-level floors CANNOT fix 404-URL transitives.
+        ;; tools.deps clones every candidate URL before choosing, so a floor
+        ;; for abi/artifact/... only EXPANDS another dead manifest (measured:
+        ;; the artifact floor introduced the abi.git clone). Dead split-repo
+        ;; URLs must be fixed at the manifest that names them (kotoba-lang/
+        ;; kotoba lib/kotoba.security still names kotoba-core-contracts.git).
         ;; Embedded DNSSEC validation for Awai domain binding TXT proofs.
         ;; Pin a release after CVE-2024-25638 and KeyTrap fixes.
         dnsjava/dnsjava {:mvn/version "3.6.5"}
@@ -105,23 +159,23 @@
         ;; floor: tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/coll
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.coll"}
         io.github.kotoba-lang/text
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.text"}
         ;; KIR interpreter used by the shipped app-admission artifacts.
         ;; Keep this pin aligned with the runtime dependency in deps.edn.
         io.github.kotoba-lang/osaho
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.osaho"}
         ;; Challenge-bound current-ref reads and committed-head verification
         ;; for Awai app admission. Keep aligned with deps.edn.
         io.github.kotoba-lang/inga
         {:git/url "https://github.com/kotoba-lang/inga.git"
-         :git/sha "cb87cdb38d73e24e9ec0c454360c3fa80a323cc5"}
+         :git/sha "10bbca4d1fc2c6d8e5717c85216007022ed17b5e"}
         io.github.kotoba-lang/inga-node
         {:git/url "https://github.com/kotoba-lang/inga-node.git"
-         :git/sha "125d80e062f3aee80c730fe24d170fb3fc55f775"}}}
+         :git/sha "870f8b0298780c2d81b6c1757c2777553b7d1322"}}}

@@ -1,0 +1,115 @@
+;; Overlay lock for the amu --jvm-free emitter checkout (NOT the app closure).
+;;
+;; Why this file exists: bin/amu at the compiler-pin.edn :amu pin (8435eafb)
+;; derives its resolution root from its own location (bin/amu line 407:
+;; `root = path.resolve(dirname(realpath(__filename)), "..")`), so
+;; `resolveWithLock` reads <amu-checkout>/deps-lock.edn -- amu's own stale
+;; lock, never the app's deps-lock.edn. amu's lock names deleted split repos
+;; (abi.git, kotoba-kir.git, ... all 404), which fails the emit with
+;; "git clone failed ... could not read Username". Regenerating the app's
+;; lock cannot fix that path; only this overlay, copied over
+;; <amu-checkout>/deps-lock.edn before compile (see scripts/ci-jvm-free-emit),
+;; reaches the resolver that actually runs.
+;;
+;; Provenance (no JVM needed to audit): entry set = amu@8435eafb's own
+;; deps-lock.edn coordinates (21, same order); :lock/deps-digest =
+;; sha256(amu@8435eafb deps.edn bytes), verified byte-identical via fetch.
+;; Nine entries are verbatim from the app's deps-lock.edn (resolvable,
+;; zero dead URLs); the other twelve map the deleted compiler splits to
+;; their monorepo successors at the same kotoba.git commit the app uses
+;; (4b2d03ed), with kir absorbed into lib/kotoba.osaho (the only home of
+;; src/kotoba/kir/* at that commit). Every recorded path was verified to
+;; exist at its recorded commit with `git ls-tree`.
+;;
+;; Bound to amu@8435eafb's deps.edn bytes: bumping :amu in compiler-pin.edn
+;; requires re-deriving this file against the new pin's deps.edn digest.
+{:lock/version 1
+ :lock/deps-digest "3f4532e7facd2d25d621030a0fcd2c8dd1f0ed53828bb3a2ae0ac2d2848f5202"
+ :lock/resolver "clojure -Spath (authoring time only)"
+ :lock/entries
+ [
+  {:coordinate "io.github.kotoba-lang/abi"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.abi/src" "lib/kotoba.abi/test" "lib/kotoba.abi/wit"] }
+  {:coordinate "io.github.kotoba-lang/artifact"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.artifact/src" "lib/kotoba.artifact/resources"] }
+  {:coordinate "io.github.kotoba-lang/dag-cbor"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.ioIpld/src" "lib/kotoba.ioIpld/resources"] }
+  {:coordinate "io.github.kotoba-lang/io-ipld"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.ioIpld/src" "lib/kotoba.ioIpld/resources"] }
+  {:coordinate "io.github.kotoba-lang/io-multiformats"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.ioMultiformats/src"] }
+  {:coordinate "io.github.kotoba-lang/json"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.json/src"] }
+  {:coordinate "io.github.kotoba-lang/kotoba-codegen"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.kotobaCodegen/src"] }
+  {:coordinate "io.github.kotoba-lang/kotoba-component"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.kotobaComponent/src" "lib/kotoba.kotobaComponent/resources"] }
+  {:coordinate "io.github.kotoba-lang/kotoba-gmir"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.kotobaGmir/src" "lib/kotoba.kotobaGmir/resources"] }
+  {:coordinate "io.github.kotoba-lang/kotoba-hir"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.kotobaHir/src"] }
+  {:coordinate "io.github.kotoba-lang/kotoba-kir"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.osaho/src" "lib/kotoba.osaho/resources"] }
+  {:coordinate "io.github.kotoba-lang/kotoba-mir"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.kotobaMir/src" "lib/kotoba.kotobaMir/resources"] }
+  {:coordinate "io.github.kotoba-lang/kotoba-native"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.kotobaNative/src" "lib/kotoba.kotobaNative/resources"] }
+  {:coordinate "io.github.kotoba-lang/kotoba-object"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.kotobaObject/src"] }
+  {:coordinate "io.github.kotoba-lang/kotoba-script"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.kotobaScript/src"] }
+  {:coordinate "io.github.kotoba-lang/kotoba-sema"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.kotobaSema/src" "lib/kotoba.kotobaSema/resources"] }
+  {:coordinate "io.github.kotoba-lang/kotoba-verifier"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.kotobaVerifier/src" "lib/kotoba.kotobaVerifier/resources"] }
+  {:coordinate "io.github.kotoba-lang/kotoba-wasm"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.kotobaWasm/src" "lib/kotoba.kotobaWasm/resources"] }
+  {:coordinate "io.github.kotoba-lang/org-ietf-cbor"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/org.ietf.cbor/src"] }
+  {:coordinate "io.github.kotoba-lang/org-nist-sha2"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/gov.nist.sha2/src"] }
+  {:coordinate "io.github.kotoba-lang/security"
+   :git-url "https://github.com/kotoba-lang/kotoba.git"
+   :git-sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+   :paths ["lib/kotoba.security/src" "lib/kotoba.security"] }
+ ]}

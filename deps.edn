@@ -5,37 +5,37 @@
         ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
         io.github.kotoba-lang/test
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.test"}
         ;; kotoba.image replaced java.awt.image.BufferedImage / javax.imageio here (2026-09-25).
         ;; An explicit floor: tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/image
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.image"}
         ;; kotoba.netcap.tls-host replaced javax.net.ssl here (2026-09-25). An explicit
         ;; floor: tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/netcap
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.netcap"}
         ;; kotoba.lang.error replaced clojure.lang.ExceptionInfo here (2026-09-25).
         ;; An explicit floor: tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/error
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.error"}
         ;; kotoba.http.form-urlencoded replaced java.net.URLEncoder/URLDecoder here
         ;; (2026-09-24). An explicit floor: tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/http-parse-url
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.http"}
         ;; kotoba.bytes replaced java.util.Base64 here (2026-09-24). An explicit
         ;; floor: tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/bytes
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.bytes"}
         ;; kotoba.io replaced clojure.java.io here (2026-09-24). An explicit floor:
         ;; kotoba.io carries clojure.java.io's file/as-file/as-relative-path/
@@ -43,27 +43,27 @@
         ;; sha it is shown.
         io.github.kotoba-lang/io
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.io"}
         ;; kotoba.json replaced clojure.data.json here (2026-09-24). An explicit
         ;; floor: kotoba.json/read-str and /write-str first exist at 9c11ad1, and
         ;; tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/json
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.json"}
         ;; kotoba.pprint replaced clojure.pprint here (2026-09-24): the same
         ;; bytes (cljs.pprint transcribed). An explicit floor; tools.deps takes the
         ;; NEWEST sha it is shown.
         io.github.kotoba-lang/pprint
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.pprint"}
         ;; kotoba replaced JVM interop here (2026-09-24). An explicit
         ;; floor: tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/coll
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.coll"}
         io.github.kotoba-lang/cloud-kotoba-dds
   ;; the Bots workspace pattern (bots.cljk + styles/bots-css + the renderer)
@@ -74,7 +74,7 @@
   ;; shinkansen.on) and the runtime web.cljk inlines
   io.github.kotoba-lang/shinkansen
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.shinkansen"}
 
         ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
@@ -82,7 +82,7 @@
         ;; this repo silently rides whatever a sibling happens to name.
         io.github.kotoba-lang/text
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.text"}
         ;; Challenge-bound current-ref reads and committed-head verification
         ;; for Awai app admission. Keep aligned with nbb.edn. Chain identity,
@@ -90,10 +90,50 @@
         ;; supplied through the chain profile.
         io.github.kotoba-lang/inga
         {:git/url "https://github.com/kotoba-lang/inga.git"
-         :git/sha "cb87cdb38d73e24e9ec0c454360c3fa80a323cc5"}
+         :git/sha "10bbca4d1fc2c6d8e5717c85216007022ed17b5e"}
         io.github.kotoba-lang/inga-node
         {:git/url "https://github.com/kotoba-lang/inga-node.git"
-         :git/sha "125d80e062f3aee80c730fe24d170fb3fc55f775"}
+         :git/sha "870f8b0298780c2d81b6c1757c2777553b7d1322"}
+        ;; Explicit floor (keep aligned with nbb.edn): org.ietf.ed25519 names
+        ;; org-nist-sha2 as a sibling :local/root while inga-node@870f8b0
+        ;; names it as a git coord. tools.deps cannot compare git-vs-local
+        ;; transitives, so the top-level floor wins outright.
+        io.github.kotoba-lang/org-nist-sha2
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/gov.nist.sha2"}
+        io.github.kotoba-lang/org-ietf-cbor
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/org.ietf.cbor"}
+        io.github.kotoba-lang/arrangement
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.arrangement"}
+        io.github.kotoba-lang/kotobase-storage
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.kotobaseStorage"}
+        io.github.kotoba-lang/prolly-tree
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.prollyTree"}
+        io.github.kotoba-lang/datalog
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.datalog"}
+        io.github.kotoba-lang/datom-source
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/kotoba.datomSource"}
+        io.github.kotoba-lang/org-ietf-deflate
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+         :deps/root "lib/org.ietf.deflate"}
+        ;; NOTE (2026-11-10, keep aligned with nbb.edn): top-level floors
+        ;; CANNOT fix 404-URL transitives -- tools.deps clones every candidate
+        ;; URL before choosing. Dead split-repo URLs must be fixed at the
+        ;; manifest that names them.
         ;; The command surface -- cloud.itonami.app.commands / .repo-profile
         ;; and the three tables (commands.edn, cli-aliases.edn, defaults.edn).
         ;; Moved out on 2026-09-15 so the CLI, the mobile bundle and this app
@@ -113,7 +153,7 @@
         ;; first-party and zero-dep, and text is the same sha pinned above.
         io.github.kotoba-lang/http
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.http"}
         ;; One promise type across both runtimes, for the move off the JVM.
         ;; host/jvm's async transport returns a CompletableFuture and
@@ -136,34 +176,34 @@
   ;; (see cloud.itonami.app.kaiyu-local). Zero deps.
   io.github.kotoba-lang/kaiyu
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.kaiyu"}
   ;; Bounded EDN codec — the direct replacement for clojure.edn
   ;; (kotoba-lang/edn README). The screen gate artifact is read through it.
   io.github.kotoba-lang/edn
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.edn"}
   ;; App identity: raw CIDv1 + :kotoba.app/* manifest (zero runtime deps).
   io.github.kotoba-lang/kotoba-protocol
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.kotobaProtocol"}
   ;; Shared host content traversal for canonical DAG-CBOR and UnixFS DAG-PB.
   ;; Match the compiler test pins so chain.core and the host use one IPLD codec.
   io.github.kotoba-lang/io-multiformats
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioMultiformats"}
   io.github.kotoba-lang/io-ipld
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioIpld"}
   ;; The app bundle reader decodes UnixFS Data metadata from DAG-PB blocks.
   ;; Keep the wire decoder explicit instead of relying on io-ipld's transitives.
   io.github.kotoba-lang/dev-protobuf
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.devProtobuf"}
   ;; L2 graph history verification. This pin adds chain.authorized on top of
   ;; chain.core's causal CID/parent verification; Itonami still supplies the
@@ -171,18 +211,18 @@
   ;; Protocol does not hash and does not depend on chain.
   io.github.kotoba-lang/chain
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.chain"}
   ;; IPNS latest pointer: real IPNS Record + delegated DHT routing.
   ;; Exclude ipns's ed25519 / dag-cbor so cacao's org-ietf-* copies of the
   ;; same namespaces (ed25519.core, cbor.core) win.
   io.github.kotoba-lang/tech-ipfs-specs-ipns
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.techIpfsSpecsIpns"}
   io.github.kotoba-lang/io-libp2p-specs-kad-dht
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioLibp2pSpecsKadDht"}
   org.clojure/data.json {:mvn/version "2.5.1"}
 
@@ -198,7 +238,7 @@
   ;; did not write is exactly the failure the artifact was supposed to remove.
   io.github.kotoba-lang/osaho
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.osaho"}
   ;; A second implementation executes the persisted portable Datalog corpus
   ;; during cutover qualification; normal Agent queries remain on langchain.db.
@@ -206,16 +246,13 @@
   com.fasterxml.jackson.dataformat/jackson-dataformat-cbor
   {:mvn/version "2.22.1"}
 
-  ;; Shared authentication vocabulary and default-deny authorization decision
-  ;; engine. Email uses the focused module so unrelated factor adapters do not
-  ;; pull local-root development dependencies into this application.
-  io.github.kotoba-lang/authentication-email
-  {:git/url "https://github.com/kotoba-lang/authentication.git"
-   :git/sha "188eb0e6ff7c0bc5fc6de04ef7b3f36fef45d9b0"
-   :deps/root "modules/email"}
+  ;; authentication-email (split repo kotoba-lang/authentication, removed
+  ;; upstream) is dropped 2026-11-10: nothing in src/test/scripts requires
+  ;; it -- only deps.edn and the stale lock named it -- and its URL 404s,
+  ;; which fails closed every stock-tools.deps resolution of this file.
   io.github.kotoba-lang/authorization
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.authorization"}
 
   ;; Non-custodial EVM account linking. Cloud Itonami never receives a private
@@ -223,7 +260,7 @@
   ;; recovers the signer address server-side.
   io.github.kotoba-lang/wallet
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.wallet"}
 
   ;; Passkey Smart Account address derivation is local and deterministic.
@@ -233,11 +270,11 @@
   ;; their namespaces.
   io.github.kotoba-lang/org-ethereum-abi
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ethereum.abi"}
   io.github.kotoba-lang/eth-crypto
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ethCrypto"}
 
   ;; System dynamics. Both are consumed, never reimplemented: xmile owns the
@@ -247,7 +284,7 @@
   ;; ADR-2607309600 decision 6 forbids.
   io.github.kotoba-lang/org-oasis-open-xmile
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.oasisOpen.xmile"}
   io.github.kotoba-lang/dynamics
   {:git/url "https://github.com/kotoba-lang/dynamics.git"
@@ -260,7 +297,7 @@
   ;; ADR-2609111230.
   io.github.kotoba-lang/ws-valueflo-vocabulary
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.wsValuefloVocabulary"}
 
   ;; Connectors (ADR-2608097000). `identity/provider-catalog` is derived from
@@ -273,46 +310,46 @@
   ;; github.workflow, and its pin above carries github.connector now.
   io.github.kotoba-lang/connector
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.connector"}
   io.github.kotoba-lang/com-google-calendar
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.comGoogleCalendar"}
   io.github.kotoba-lang/com-google-drive
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.comGoogleDrive"}
   io.github.kotoba-lang/com-google-gmail
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.comGoogleGmail"}
   io.github.kotoba-lang/com-microsoft-graph
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.comMicrosoftGraph"}
   io.github.kotoba-lang/com-slack
   {:git/url "https://github.com/cloud-itonami/itonami-registry.git"
-   :git/sha "72ddcbad097f921ee4fecef39528419133e91494"
+   :git/sha "d4fcfcdced8678d24ab747edc46f5f3acd6f823d"
    :deps/root "compat/com-slack"}
   io.github.kotoba-lang/com-notion
   {:git/url "https://github.com/cloud-itonami/itonami-registry.git"
-   :git/sha "3f3f3ea9361d0602224ebdd2aeb1baa874c0bb40"
+   :git/sha "d4fcfcdced8678d24ab747edc46f5f3acd6f823d"
    :deps/root "compat/com-notion"}
   io.github.kotoba-lang/com-google-chat
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.comGoogleChat"}
 
   ;; Foundational host planes (ADR-0066): confined fs + process spawn.
   ;; Twin of ambient java.nio / ProcessBuilder. Absolute binaries only.
   io.github.kotoba-lang/fs
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.fs"}
   io.github.kotoba-lang/process
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.process"}
   io.github.kotoba-lang/shell
   {:git/url "https://github.com/kotoba-lang/shell.git"
@@ -334,7 +371,7 @@
    :git/sha "2d9b9fc5efe80ea42afaa30bbdf8915fe4d9540f"}
   io.github.kotoba-lang/mail
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.mail"}
 
   ;; The three wire protocols a mailbox is actually reached over. Each one is
@@ -348,7 +385,7 @@
   ;; Microsoft, and could not send mail at all.
   io.github.kotoba-lang/com-gmail
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.comGmail"}
 
   ;; The message format those protocols carry. Not optional: an IMAP or POP3
@@ -358,22 +395,22 @@
   ;; how a multipart/alternative message comes out as its own MIME boundaries.
   io.github.kotoba-lang/org-ietf-mime
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.mime"}
   io.github.kotoba-lang/org-ietf-pop3
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.pop3"}
   ;; Pinned to the commit that added whole-message reads (`fetch-message!` /
   ;; `list-recent!`). The prior pin could fetch headers only, which is enough
   ;; to triage a mailbox and not enough to show one.
   io.github.kotoba-lang/org-ietf-imap
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.imap"}
   io.github.kotoba-lang/org-ietf-smtp
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.smtp"}
   ;; advanced from 90eac285 (fast-forward): that pin predates
   ;; drive/object.cljc, which is the IObjectStore seam this app now fills. The
@@ -386,7 +423,7 @@
   ;; ed25519.core (org-ietf-ed25519) onto this classpath.
   io.github.kotoba-lang/org-chainagnostic-cacao
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.chainagnostic.cacao"}
   ;; W3C Verifiable Credentials with real Data Integrity proofs
   ;; (ADR-2607309400). org-w3-vc validates a credential's SHAPE and treats
@@ -399,18 +436,18 @@
   ;; supported now, and that message was the last thing making it untrue.
   io.github.kotoba-lang/org-w3-vc-data-integrity
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.w3.vcDataIntegrity"}
   ;; The -rdfc- tower. Present so the credential's own tests can prove that its
   ;; claims survive RDF canonicalization -- the failure this context exists to
   ;; prevent is invisible under JCS.
   io.github.kotoba-lang/org-w3-json-ld-api
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.w3.jsonLdApi"}
   io.github.kotoba-lang/org-w3-rdf-canon
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.w3.rdfCanon"}
   ;; OID4VP, Verifier side only. The Wallet side needs a holder key that can sign
   ;; over a Verifier-supplied nonce, and a Passkey cannot -- it signs its own
@@ -423,54 +460,54 @@
   ;; revealing which did:key they are, which is unlinkability across verifiers.
   io.github.kotoba-lang/org-ietf-sd-jwt-vc
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.sdJwtVc"}
   io.github.kotoba-lang/org-ietf-sd-jwt
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.sdJwt"}
   io.github.kotoba-lang/org-ietf-jws
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.jws"}
   io.github.kotoba-lang/org-openid-oid4vp
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/net.openid.oid4vp"}
   io.github.kotoba-lang/org-w3-vc-bitstring-status-list
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.w3.vcBitstringStatusList"}
   io.github.kotoba-lang/org-ietf-jcs
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.jcs"}
   ;; The RFC 3161 / 4998 stack. None of it existed when ADR-2607310000 landed,
   ;; which is why that ADR records an app-attested time and no way to survive
   ;; algorithm ageing. asn1 -> x509 -> cms -> rfc3161 -> ers.
   io.github.kotoba-lang/org-ietf-asn1
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.asn1"}
   io.github.kotoba-lang/org-ietf-x509
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.x509"}
   io.github.kotoba-lang/org-ietf-cms
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.cms"}
   io.github.kotoba-lang/org-ietf-rfc3161
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.rfc3161"}
   io.github.kotoba-lang/org-ietf-ers
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.ers"}
   io.github.kotoba-lang/org-w3-did
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.w3.did"}
   ;; did:webvh 1.0 — the organization root DID (ADR-0068). `org-w3-did` above
   ;; still answers for did:key and did:web; this one owns the log, the
@@ -480,7 +517,7 @@
   ;; its own HSM later without touching this app.
   io.github.kotoba-lang/foundation-identity-didwebvh
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.foundationIdentityDidwebvh"}
   ;; Showing an uploaded PDF. `hanmen` walks the content stream into placed
   ;; marks and emits SVG from a closed vocabulary; `org-iso-pdf` comes with
@@ -489,34 +526,38 @@
   ;; that keeps uploaded bytes from being served inline.
   io.github.kotoba-lang/hanmen
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.hanmen"}
   ;; What a composite font's CIDs mean when it ships no /ToUnicode. Adobe's
   ;; published tables, vendored — a megabyte of resource, which is why
   ;; `hanmen` takes the resolver rather than owning it.
   io.github.kotoba-lang/com-adobe-cmap
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.comAdobeCmap"}
   ;; Raw samples out of a PDF image XObject are not a picture until something
   ;; encodes them. `png.encode` landed for exactly this.
   io.github.kotoba-lang/org-w3-png
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.w3.png"}
+  ;; 2026-11-10: bump 20f6f49 -> 89874bdf (drive main dropped the deleted
+  ;; kotoba-lang/bytes.git split for monorepo lib/kotoba.bytes; the stale
+  ;; bytes.git URL failed the lock regen closed). Namespaces verified
+  ;; identical at HEAD: drive/object, drive/workspace, drive/store/fs.
   io.github.kotoba-lang/drive
   {:git/url "https://github.com/kotoba-lang/drive.git"
-   :git/sha "20f6f4940a60061b692aa53ae501e2d36f8bf010"}
+   :git/sha "89874bdf1bbb4a9729b57742b8193f56151a6184"}
   ;; Client-side Drive encryption. Object stores receive only ciphertext
   ;; packages; sharing adds recipient key wraps without touching the chunks.
   io.github.kotoba-lang/envelope
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.envelope"}
   ;; Portable schedule/residency policy shared with the Finder bridge.
   io.github.kotoba-lang/com-apple-fileprovider
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.comAppleFileprovider"}
 
   ;; UnixFS file DAGs — the reference `cloud.itonami.app.kotobase-objects`
@@ -524,7 +565,7 @@
   ;; the whole reason that store exists. It carries `ipld.dag-pb` under it.
   io.github.kotoba-lang/tech-ipfs-specs-unixfs
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.techIpfsSpecsUnixfs"}
 
   ;; The Drive as a mountable volume (ADR-2608171200). NFSv3 was chosen by
@@ -533,7 +574,7 @@
   ;; `nfs.v3/IFilesystem` is the seam `cloud.itonami.app.drive-fs` fills.
   io.github.kotoba-lang/org-ietf-nfs
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.ietf.nfs"}
 
   ;; kekkai.acl is pure, deny-by-default and port-granular — the
@@ -542,7 +583,7 @@
   ;; belongs.
   io.github.kotoba-lang/kekkai
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.kekkai"}
 
   ;; `kekkai.node.netmap` is the NODE's half of the same deny-by-default
@@ -570,14 +611,14 @@
   ;; which is the same arrangement as the object stores above.
   io.github.kotoba-lang/sheets
   {:git/url "https://github.com/kotoba-lang/sheets.git"
-   :git/sha "30f4737647c75baa9c1e11194dabb3b25c8d212f"}
+   :git/sha "6036ed4b367b85324d44bd5c4b183e133c38c67e"}
   io.github.kotoba-lang/docs
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.docs"}
   io.github.kotoba-lang/forms
   {:git/url "https://github.com/kotoba-lang/forms.git"
-   :git/sha "142c34d76d21e982586ac6be83a274be7438bbcc"}
+   :git/sha "c7242bd0778e4c6eef9de69c48e72b71e5904cd9"}
   ;; The fourth surface. Heavier than its siblings — it brings office, ooxml,
   ;; drawingml, presentationml, office-style, canvaskit, css, xml and the
   ;; kotoba-ui stack, because `slides` is also a Pages application and not
@@ -586,7 +627,7 @@
   ;; not code that runs.
   io.github.kotoba-lang/slides
   {:git/url "https://github.com/kotoba-lang/slides.git"
-   :git/sha "a7cf5a6bc0b7c5813fc6291f96754d3b8784af39"}
+   :git/sha "80fd4a238c1cb4b271c46532efd84ae3940e2522"}
   ;; Named directly even though all three now agree on it. They agree because
   ;; sheets and docs were advanced off 77e3ce7d for the rehydrate work; before
   ;; that they pinned the last commit before the wire moved to plain JSON and
@@ -594,7 +635,7 @@
   ;; being asked. Saying which one means that does not happen again silently.
   io.github.kotoba-lang/transit
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.transit"}
 
   ;; The records-and-reachability authorities the authority adapters pre-check
@@ -605,11 +646,11 @@
   ;; cloud.itonami.app.authority.card requires it by itself.
   io.github.kotoba-lang/esim
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.esim"}
   io.github.kotoba-lang/card
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.card"}
   ;; phone arrives transitively through esim -> card, but at whatever sha CARD
   ;; happens to pin -- which is older than the numbering, portability and
@@ -619,21 +660,21 @@
   ;; does not know about either adapter.
   io.github.kotoba-lang/phone
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.phone"}
   ;; Storj as an IObjectStore. Its store-fns produce exactly the four-function
   ;; map drive.object/store-of takes, and neither library depends on the other
   ;; — this app depends on both, which is the arrangement both docstrings name.
   io.github.kotoba-lang/io-storj
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioStorj"}
   ;; the other end: running a node rather than using a bucket. See
   ;; cloud.itonami.app.storj-node for the two gates before it can join the
   ;; public network — neither of them is code.
   io.github.kotoba-lang/io-storj-node
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioStorjNode"}
   ;; webauthn.assurance — 「この passkey は実際に何を証明しているか」の 4 段階。
   ;; 2026-08-07 まではこの repo の cloud.itonami.app.credential-assurance に
@@ -641,12 +682,12 @@
   ;; パスキーの強さについて別々のことを言う状態だった。judgement は共有面へ。
   io.github.kotoba-lang/webauthn
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.webauthn"}
 
   io.github.kotoba-lang/identity
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.identity"}
 
   ;; Delegation, and the ONE thing that decides it.
@@ -660,7 +701,7 @@
   ;; kotoba://graph/alice-evil).
   io.github.kotoba-lang/authority
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.authority"}
 
   ;; 12148e0 (2026-09-24) is a floor: it folds `holder` across blocks in
@@ -669,7 +710,7 @@
   ;; every share answered :holder-absent there (share-grant-test, measured).
   io.github.kotoba-lang/org-biscuitsec
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/org.biscuitsec.biscuit"}
   ;; (`authentication` / `authorization` are declared once at the top of this
   ;; map, as `authentication-email` + `authorization` at these same SHAs. The
@@ -694,7 +735,7 @@
   ;; `cloud.itonami.app.store` could not be portable.
   io.github.kotoba-lang/langchain
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.langchain"}
   ;; NOT added: io.github.kotoba-lang/kgraph.
   ;;
@@ -715,10 +756,10 @@
   ;; in DataLad and are verified there before this head advances.
   io.github.kotoba-lang/kotobase
   {:git/url "https://github.com/kotoba-lang/kotobase.git"
-   :git/sha "4a85fd732a7aac8e8273f15556b5a9c43fc6cf82"}
+   :git/sha "c191dd0fecb67f28b9f6eff79269800b45414f89"}
   io.github.etzhayyim/kaiyaku
   {:git/url "https://github.com/etzhayyim/com-etzhayyim-kaiyaku.git"
-   :git/sha "b112a5ce4f61e3c561544e20a6aab5fb15e6c1fa"
+   :git/sha "beb3a40dc41f62fd76cd98e8f424e02f514f783b"
    ;; tate still names the pre-migration coordinate. Both coordinates provide
    ;; the same namespaces, so an uberjar can otherwise retain the older files
    ;; and fail at startup when rdf-canon calls the newer sha384 API.
@@ -728,7 +769,7 @@
   ;; protocol and nothing else; the tools it serves are already in `fleet`.
   io.github.kotoba-lang/org-anthropic-mcp
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/com.anthropic.mcp"}
   ;; Agent-first domain lifecycle. The library owns pure Cloudflare Registrar
   ;; and DNS request shapes; this app owns credentials, HTTP, Passkey approval,
@@ -738,13 +779,13 @@
    :git/sha "97a0144af55e9d19695561ec5c07a8e124615a6c"}
   io.github.kotoba-lang/oauth
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.oauth"}
   ;; Bumped for github.connector (ADR-2608097000). github.workflow, which this
   ;; app already used, is unchanged by that commit.
   io.github.kotoba-lang/com-github
   {:git/url "https://github.com/cloud-itonami/itonami-registry.git"
-   :git/sha "37cd0ef7984521aa85f4a4e354f2069bc1653e01"
+   :git/sha "d4fcfcdced8678d24ab747edc46f5f3acd6f823d"
    :deps/root "compat/com-github"}
   ;; Durable organizational roles and desired-capacity reconciliation. Kanban
   ;; work in this app supplies goals; yakuwari remains the authority for how
@@ -752,14 +793,14 @@
   ;; require a human.
   io.github.kotoba-lang/yakuwari
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.yakuwari"}
   ;; Bounded executions dispatched by the durable WorkItem reconciler. Agent
   ;; owns the lifecycle vocabulary; HIL owns the human decision envelope used
   ;; by Agent Control when a run reaches a device/tool gate.
   io.github.kotoba-lang/agent
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.agent"}
   ;; io.github.<org>/<name> is the coordinate tools.deps derives from the
   ;; repository, and the spelling all three declarers of kotoba-lang/hil
@@ -769,7 +810,7 @@
   ;; carries hil.* twice.
   io.github.kotoba-lang/hil
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.hil"}
   ;; FLOOR, with the reason next to it: `jp-go-dds.dark` landed upstream in
   ;; 794ec5c (2026-08-04) and the previous pin here was 277e8c3 (2026-07-26),
@@ -782,7 +823,7 @@
   ;; focus return that the App overlay and the settings sheet stand on).
   io.github.kotoba-lang/jp-go-digital-design-system
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.jpGoDigitalDesignSystem"}
 
   ;; Filecoin: PieceCID v2 addressing + the on-chain read surface + the
@@ -793,15 +834,268 @@
   ;; prescribes.
   io.github.kotoba-lang/cloud-filecoin
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.cloudFilecoin"}
   io.github.kotoba-lang/io-filecoin-transport
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioFilecoinTransport"}}
 
  :aliases
- {:build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.8"}}
+ {;; Lock-regen resolution overrides. A top-level :deps floor only wins
+  ;; version selection -- tools.deps still clones every losing candidate
+  ;; URL, and a project-top-level :override-deps is IGNORED (measured
+  ;; 2026-11-10: engine.git still cloned), so dead-split replacement lives
+  ;; in this alias and the lock regen runs `clojure -Spath -A:ci-lock`.
+  ;; An alias :override-deps entry REPLACES the coordinate everywhere it is
+  ;; named, so the dead URL is never fetched. Precedent: :product-kir-gen's
+  ;; osaho/io-multiformats/io-ipld.
+  :ci-lock
+  {:override-deps
+   {;; kotobase@HEAD still names deleted kotobase-engine.git (404). The app
+    ;; uses kotobase.local/store only (neither requires kotobase.engine.*),
+    ;; and the monorepo carries the same namespace family, so even
+    ;; kotobase.core keeps resolving.
+    io.github.kotoba-lang/kotobase-engine
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.kotobaseEngineContract"}
+    ;; lawfirm@8889aa0 still names these deleted splits (all 404). None is
+    ;; directly required by the app (lawfirm.workspace/store/actor only);
+    ;; the monorepo carries each namespace family. Amu refs inside these
+    ;; targets are :test-alias-only (verified positions), so they never
+    ;; enter resolution.
+    io.github.kotoba-lang/appkit
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.appkit"}
+    io.github.kotoba-lang/css
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.css"}
+    io.github.kotoba-lang/design-quality
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.designQuality"}
+    io.github.kotoba-lang/governor
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.governor"}
+    io.github.kotoba-lang/html
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.html"}
+    io.github.kotoba-lang/kotoba-ui
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.kotobaUi"}
+    io.github.kotoba-lang/langgraph
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.langgraph"}
+    io.github.kotoba-lang/liquid-glass-ui
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.liquidGlassUi"}
+    io.github.kotoba-lang/shitsuke
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.shitsuke"}
+    ;; yotei/dds name deleted jp-go (404); kekkai-node names deleted bytes/
+    ;; noise/org-ietf-dns (404); shinkansen split is deleted too (floored at
+    ;; top level, which cannot stop the losing-candidate clone). Targets
+    ;; verified present at the app pin; amu refs inside are test-only.
+    io.github.kotoba-lang/jp-go-digital-design-system
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.jpGoDigitalDesignSystem"}
+    io.github.kotoba-lang/shinkansen
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.shinkansen"}
+    io.github.kotoba-lang/bytes
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.bytes"}
+    io.github.kotoba-lang/noise
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.noise"}
+    io.github.kotoba-lang/org-ietf-dns
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/org.ietf.dns"}
+    ;; kagi@3869776 (restored: HEAD dropped its root manifest) still names
+    ;; deleted security.git. Same family exists in the monorepo; the app
+    ;; touches kagi.* only.
+    io.github.kotoba-lang/security
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.security"}
+    ;; kagi@3869776 + kaiyaku@b112a5c name deleted dag-cbor/kagitaba/
+    ;; org-chainagnostic-cacao (all 404); grant/abi@b94158fd (via inga's
+    ;; subtree) name deleted abi/kotoba-core-contracts. dag-cbor is
+    ;; comment-only in kagi (no namespace requires it), so ioIpld stands
+    ;; in as the IPLD-family placeholder; the rest map to same-namespace
+    ;; monorepo libs.
+    io.github.kotoba-lang/abi
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.abi"}
+    io.github.kotoba-lang/kotoba-core-contracts
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.kotobaCoreContracts"}
+    io.github.kotoba-lang/dag-cbor
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.ioIpld"}
+    io.github.kotoba-lang/kagitaba
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.kagitaba"}
+    io.github.kotoba-lang/org-chainagnostic-cacao
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/org.chainagnostic.cacao"}
+    ;; inga's b94158fd subtree (kotobaFleet/biscuit/jws/sdJwtVc manifests)
+    ;; still names deleted org-ietf-ed25519/osaho. Same-namespace monorepo
+    ;; targets; both manifests are local-only.
+    io.github.kotoba-lang/org-ietf-ed25519
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/org.ietf.ed25519"}
+    io.github.kotoba-lang/osaho
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.osaho"}
+    ;; kotoba@v0.6.29 bare-sha coords (URL inferred from the lib name) and
+    ;; commands@9bd4ec8 name deleted datom/ed25519/kotoba-script/
+    ;; kotoba-selfhost-contracts/org-ietf-cbor/org-w3-did/text. The app
+    ;; requires ed25519.core (provided by org.ietf.ed25519) and the
+    ;; io-multiformats/cbor floors already select monorepo copies; these
+    ;; overrides stop the losing-candidate clones. Amu refs in the two
+    ;; contract targets are test-only (verified positions).
+    io.github.kotoba-lang/datom
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.datom"}
+    io.github.kotoba-lang/ed25519
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/org.ietf.ed25519"}
+    io.github.kotoba-lang/kotoba-script
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.kotobaScript"}
+    io.github.kotoba-lang/kotoba-selfhost-contracts
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.kotobaSelfhostContracts"}
+    io.github.kotoba-lang/org-ietf-cbor
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/org.ietf.cbor"}
+    io.github.kotoba-lang/org-w3-did
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/org.w3.did"}
+    io.github.kotoba-lang/text
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.text"}
+    ;; kagi@3869776 {:sha}-form coord names deleted tech-ipfs-specs-ipns.
+    ;; Same-namespace monorepo target (local-only manifest).
+    io.github.kotoba-lang/tech-ipfs-specs-ipns
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.techIpfsSpecsIpns"}
+    ;; cloud-filecoin and io-filecoin-transport each carry a :local/root
+    ;; io-filecoin; the two worktrees give the same lib name two unrelated
+    ;; local paths with no ancestor relationship. A single git coordinate
+    ;; wins outright (same content, one checkout).
+    io.github.kotoba-lang/io-filecoin
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.ioFilecoin"}
+    ;; Same worktree-duplicate class: org-w3-json-ld-api and org-w3-rdf-canon
+    ;; each carry a :local/root org-w3-nquads. Single git coordinate wins.
+    io.github.kotoba-lang/org-w3-nquads
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/org.w3.nquads"}
+    ;; Same class, found by worktree analysis (local-refs.json): xml is
+    ;; :local/root-referenced from three worktrees with no top-level git
+    ;; coordinate. Its manifest is local-only (test/text).
+    io.github.kotoba-lang/xml
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.xml"}
+    ;; Same class, git-vs-local: docs carries a :local/root ooxml while
+    ;; inga's b94158fd subtree names ooxml as git. Uncomparable; a single
+    ;; git coordinate wins (manifest is local-only).
+    io.github.kotoba-lang/ooxml
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.ooxml"}
+    ;; inga@10bbca4 floors io/coll/edn/test/text/kotobase-storage/arrangement
+    ;; at the September monorepo pin b94158fd. Top-level floors win version
+    ;; selection but tools.deps still materializes the losing b94158fd
+    ;; worktree for comparison (and fails the checkout under disk pressure).
+    ;; Overrides replace those coords graph-wide, so the old pin loses all
+    ;; referrers and is never fetched. Targets duplicate the existing floors.
+    io.github.kotoba-lang/io
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.io"}
+    io.github.kotoba-lang/coll
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.coll"}
+    io.github.kotoba-lang/edn
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.edn"}
+    io.github.kotoba-lang/test
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.test"}
+    io.github.kotoba-lang/kotobase-storage
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.kotobaseStorage"}
+    io.github.kotoba-lang/arrangement
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.arrangement"}
+    ;; ed25519 and org-ietf-ed25519 both override to lib/org.ietf.ed25519,
+    ;; so its :local/root x25519 resolves in two same-content worktrees.
+    ;; A single git coordinate wins (manifest needs test only).
+    io.github.kotoba-lang/org-ietf-x25519
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/org.ietf.x25519"}
+    ;; slides@HEAD names the office stack (transit/drawingml/presentationml/
+    ;; office-style) as b94158fd git coords; their manifests carry :local/root
+    ;; siblings that collide git-vs-local. Same-namespace monorepo targets,
+    ;; all local-only manifests. This also drops the last b94158fd referrers.
+    io.github.kotoba-lang/transit
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.transit"}
+    io.github.kotoba-lang/drawingml
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.drawingml"}
+    io.github.kotoba-lang/presentationml
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.presentationml"}
+    io.github.kotoba-lang/office-style
+         {:git/url "https://github.com/kotoba-lang/kotoba.git"
+          :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
+          :deps/root "lib/kotoba.officeStyle"}}}
+ :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.8"}}
           :ns-default build}
   :release-sign {:extra-paths ["dev"]
                  :main-opts ["-m" "cloud.itonami.app.sign-update-manifest"]}
@@ -850,15 +1144,15 @@
    :override-deps
    {io.github.kotoba-lang/osaho
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.osaho"}
     io.github.kotoba-lang/io-multiformats
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioMultiformats"}
     io.github.kotoba-lang/io-ipld
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioIpld"}}
    :main-opts ["-m" "gen-product-policy-kir"]}
   :collection-test {:extra-paths ["test"] :main-opts ["-m" "collection-nbb"]}
@@ -873,7 +1167,7 @@
                       ;; interpreter (ADR-0037). `tender-native` redirects here.
                       io.github.kotoba-lang/kototama-native
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.kototamaNative"}}
          ;; `kotoba-lang/compiler` is TEST-ONLY here, for the decision-core
          ;; parity gate (`policy-kotoba-parity-test` over
@@ -950,15 +1244,15 @@
           ;; `:unknown-function` if left behind).
           io.github.kotoba-lang/osaho
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.osaho"}
           io.github.kotoba-lang/io-multiformats
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioMultiformats"}
           io.github.kotoba-lang/io-ipld
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
-         :git/sha "7e1dbe0aece831138e6106c59d2b26375d0f60c4"
+         :git/sha "4b2d03ed49fc555b8597d4692837d72b6af4e464"
          :deps/root "lib/kotoba.ioIpld"}}
          :jvm-opts ["-Dcloud.itonami.data-dir=target/test-data"]
          :main-opts ["-m" "cloud.itonami.app.test-runner"]}

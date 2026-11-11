@@ -87,6 +87,11 @@
         {:keys [exit stdout stderr]} (sh amu args)
         text (str stdout "\n" stderr)]
     (when-not (zero? exit)
+      ;; Print the emitter's own output: the ex-info :stderr never reaches
+      ;; the CI log (only Message/Location/Stack print), which hides the
+      ;; real cause on a red emit.
+      (println (str "amu stderr for " id " target=" target " exit=" exit))
+      (println text)
       (throw (ex-info (str "amu compile failed for " id " target=" target)
                       {:id id :target target :exit exit :stderr text})))
     (reject-planned! text output)
