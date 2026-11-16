@@ -1,6 +1,6 @@
 (ns itonami.workspace-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [itonami.workspace.core :as core] [itonami.workspace.view :as view]))
+            [itonami.workspace.core :as core]))
 
 (deftest owner-and-delegation
   (let [s (core/initial-state "owner-a")
@@ -36,8 +36,7 @@
   (is (= "保持条件成立" (core/storage-label {:local-durable? true :remote-receipts-verified? true
                                       :retention-policy-satisfied? true})))
   (is (= "モデルの準備が必要" (core/model-label {:disk :unverified :memory :ready})))
-  (is (= 6 (count core/apps)))
-  (is (vector? (view/workspace (core/initial-state nil)))))
+  (is (= 6 (count core/apps))))
 
 (defn -main []
   (let [r (run-tests 'itonami.workspace-test)]

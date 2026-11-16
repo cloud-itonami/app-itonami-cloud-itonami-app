@@ -1,58 +1,40 @@
-# Awai Bots and Apps — Otehon candidate
+# Awai portable Bot and model policies
 
 Tracking: [AWAI-538](https://linear.app/kotobalabs/issue/AWAI-538).
-Design first: [editable six-screen flow](https://www.figma.com/design/EFljF3PXOrrVNM2v9Wdis1?node-id=20-3).
-[Feature and verification ledger](https://docs.google.com/spreadsheets/d/1ToGgKnjwca069sctG3byfbMk7HtcjUNl_2xdm3xARTc/edit).
+The [original desktop Figma baseline](https://www.figma.com/design/umqCqP5KSjLWh9fhCI1HaN?node-id=216-476)
+controls UI composition. Follow `AGENTS.md` before adding a user interface.
 
-`src/itonami/workspace/core.cljc` owns the portable workspace catalog, owned Bot
-creation planner and model operation planner. `view.cljc` maps the Figma flow to
-semantic Hiccup. `browser.cljs` renders the static candidate with text nodes,
-native form validation, keyboard focus and no external requests. This Otehon
-path is separate from Native selfhost qualification and the existing resident
-server. Existing resident endpoints are not moved or stopped.
+`src/itonami/workspace/core.cljc` owns the portable Apps catalog, owned Bot
+creation planner and model-operation planner. It performs no I/O, authentication,
+key creation, inference, provisioning, consent or persistence. The caller must
+supply verified host observations; a request never proves completion.
 
-Manimani is the main Bot. Additional Bots retain their user's owner identity;
-a Bot can propose a child with at most its own capabilities. The planner never
-creates DID, keys or approvals. The browser currently has no authenticated owner
-adapter, so actual creation is refused without losing or sending the input.
+Manimani is the main Bot. Additional Bots keep the user's owner identity. A
+child Bot can receive at most its creator's capabilities. Missing ownership,
+missing parents and capability expansion are refused. Model download and RAM
+residency are separate states; a release is refused while leases are active or
+unknown. Model admission needs a measured available budget and runtime peak.
+The pure policy does not prove that a model fits 24GB.
 
-The Apps catalog contains Dougaka, Gaka, Mangaka, Ongakuka, Animeka and Dandori.
-Gaka/Mangaka share Qwen Image Turbo; Dougaka/Ongakuka/Animeka share MiniMax H3.
-Dandori uses the local agent. A model operation request is distinct from a
-verified host result. Download leaves an on-disk artifact; release removes only
-its RAM residency. Active/unknown leases refuse release. Load admission needs a
-measured available budget and runtime peak including temporary buffers/KV state.
-No full 24GB model-fit claim is made.
+The catalog names Dougaka, Gaka, Mangaka, Ongakuka, Animeka and Dandori. These
+entries describe intended integrations, not functioning generators. Awai FS
+status labels distinguish local durability from verified remote retention.
 
 ## Validation
 
-Run `bb -cp otehon/src:otehon/test -m itonami.workspace-test` from repository root.
-Run `npm ci && npm run build` from `otehon` (shadow-cljs 3.5.13) and
-serve `public/` as static files. The current candidate CSP denies network and
-iframes until the canonical operation broker and verified adapters are linked.
-Do not relax that CSP merely to make an arbitrary extension load.
+Run `bb -cp otehon/src:otehon/test -m itonami.workspace-test` from the repository
+root. `.github/workflows/otehon-workspace.yml` pins the Otehon reference runtime
+and runs this independently of Native selfhost gates.
 
-## Remaining connections
+## Remaining implementation
 
-- AWAI-180/258: authenticated user-side host, actual itonami-agent execution,
-  bounded Bot creation tool, voice and computer tool adapters. Memory-only UI
-  state is not durable Bot provisioning.
-- AWAI-2933: owner/DID custody and recovery. Keep Hermes and Itonami stores separate.
-- AWAI-2927: immutable source + complete Qwen encoder/denoiser/VAE/runtime pins,
-  MiniMax H3 local backend, actual generation, 24GB admission measurements.
-  H3 public base provides 768p audio-video. API-only context/2K stages are separate;
-  Ongakuka audio-only output is unqualified.
-- AWAI-155: standard MCP Apps JSON-RPC/postMessage iframe host. Verify origin,
-  source window, resource policy, bounded routes and trusted operation-specific
-  user approval via the canonical broker. No iframe or Bot may mint consent.
-  ChatGPT-specific `window.openai` extensions are a separate compatibility matrix.
-- AWAI-531/532/534: canonical bytes/CID, durable save/recovery, independent-node
-  receipts/retention, conflicts and offline retries. The display consumes these
-  facts and does not implement a second filesystem.
+The standalone `/workspace/` screen was rejected for changing the existing
+Awai composition, and is excluded from this change. Its source and the real
+adapter work remain preserved in the original task worktree. This PR does not
+ship a replacement desktop or qualify actual Bot creation, model download/load,
+Gaka generation, Awai FS save/sync, or an MCP Apps iframe host.
 
-Sources checked 2026-11-16:
-[OpenAI Plugins](https://developers.openai.com/plugins),
-[MCP Apps UI](https://developers.openai.com/plugins/build/chatgpt-ui),
-[Grok Bots](https://docs.x.ai/grok-bot/bots),
-[MiniMax H3](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/README.md),
-[Qwen encoder source](https://huggingface.co/AtomicChat/Qwen-Image-2.1-Turbo-Uncensored-GGUF).
+Continue through AWAI-180/258 (agent execution), AWAI-2933 (identity/custody),
+AWAI-2927 (media/model qualification), AWAI-155 (standard MCP Apps) and
+AWAI-531/532/534 (storage). Follow the Figma baseline, then design affected states,
+implement within the existing shell, compare screens and verify on 6600H.
