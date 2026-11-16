@@ -1,0 +1,30 @@
+name: Otehon workspace contract
+
+on:
+  pull_request:
+    paths: ['otehon/**', '.github/workflows/otehon-workspace.yml']
+  push:
+    branches: [main]
+    paths: ['otehon/**', '.github/workflows/otehon-workspace.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Otehon is the stable-runtime reference under AWAI-160. This independent
+  # job is not a Native build/gate/fallback or evidence of device integration.
+  otehon-portable-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: cachix/install-nix-action@b85815f71a6de0ddee80b8a80a98d43f4bcc66c7
+      - name: Test Otehon policy with pinned Babashka
+        run: |
+          nix-shell --pure -E '
+            let pkgs = import (builtins.fetchTarball {
+              url = "https://github.com/NixOS/nixpkgs/archive/f5c082a40f7571c266e74e80ae2e68aadd8a9fc7.tar.gz";
+              sha256 = "11cw91q3r1nrlh3sc86n1jipgijy3njp3z9s3j0rwi6mi2adc6ki";
+            }) {};
+            in pkgs.mkShell { packages = [ pkgs.babashka ]; }
+          ' --run 'bb -cp otehon/src:otehon/test -m itonami.workspace-test'
