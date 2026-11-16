@@ -1,0 +1,4 @@
+{:source-paths ["src"]
+ :builds {:workspace {:target :browser :output-dir "public/assets"
+                      :asset-path "assets"
+                      :modules {:main {:init-fn itonami.workspace.browser/init}}}}}
