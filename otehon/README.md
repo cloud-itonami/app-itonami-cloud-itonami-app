@@ -35,6 +35,6 @@ ship a replacement desktop or qualify actual Bot creation, model download/load,
 Gaka generation, Awai FS save/sync, or an MCP Apps iframe host.
 
 Continue through AWAI-180/258 (agent execution), AWAI-2933 (identity/custody),
-AWAI-2927 (media/model qualification), AWAI-155 (standard MCP Apps) and
+AWAI-2927 (media/model qualification), AWAI-538 (standard MCP Apps integration) and
 AWAI-531/532/534 (storage). Follow the Figma baseline, then design affected states,
 implement within the existing shell, compare screens and verify on 6600H.
