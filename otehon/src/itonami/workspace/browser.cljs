@@ -26,7 +26,7 @@
   (.addEventListener js/document "click"
     (fn [e]
       (when-let [button (.closest (.-target e) "button[data-action]")]
-        (swap! state assoc :view (keyword (.getAttribute button "data-action")))
+        (swap! state assoc :view (keyword (.getAttribute button "data-action")) :notice nil)
         (render!)
         (when-let [heading (.querySelector js/document "main h1")]
           (.setAttribute heading "tabindex" "-1") (.focus heading)))))

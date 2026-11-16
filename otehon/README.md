@@ -27,7 +27,7 @@ No full 24GB model-fit claim is made.
 ## Validation
 
 Run `bb -cp otehon/src:otehon/test -m itonami.workspace-test` from repository root.
-Run `shadow-cljs release workspace` from `otehon` with shadow-cljs 3.5.13 and
+Run `npm ci && npm run build` from `otehon` (shadow-cljs 3.5.13) and
 serve `public/` as static files. The current candidate CSP denies network and
 iframes until the canonical operation broker and verified adapters are linked.
 Do not relax that CSP merely to make an arbitrary extension load.

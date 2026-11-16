@@ -1,0 +1,10 @@
+{
+  "name": "itonami-awai-workspace-otehon",
+  "private": true,
+  "scripts": {
+    "build": "shadow-cljs release workspace"
+  },
+  "devDependencies": {
+    "shadow-cljs": "3.5.13"
+  }
+}
