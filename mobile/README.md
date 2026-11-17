@@ -67,9 +67,13 @@ command pane is the only screen that sends a request to the paired ingress.
 
 ## One app, and a shinkansen bundle (ADR-0143)
 
-This is **the** itonami iOS / Android app: `cloud.itonami.app` on both stores,
-kotoba-shell as the only host. The Tauri app and the `dev.kotoba.itonami` iOS
-declaration in network-awai/cloud-itonami are superseded by this manifest.
+This is **the** itonami iOS / Android app under kotoba-shell: `cloud.itonami.app`
+on both stores. The old Tauri app and the `dev.kotoba.itonami` iOS declaration
+in network-awai/cloud-itonami are superseded by this manifest. Since 2026-11-17
+(owner decision, AWAI-3015) `tauri/` is a second, separate host for this same
+bundle on Tauri v3 behind the consent broker; see `tauri/README.md`. It does
+not replace the kotoba-shell manifest, and kotoba-shell is no longer the only
+host.
 
 The bundle follows parts of `docs/SHELL-BINDING.md` in
 [`kotoba-lang/shinkansen`](https://github.com/kotoba-lang/shinkansen): the
