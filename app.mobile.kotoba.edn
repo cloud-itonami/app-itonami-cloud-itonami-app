@@ -19,10 +19,13 @@
 ;;     --manifest app.mobile.kotoba.edn --policy mobile/shell-policy.edn \
 ;;     --output-dir target/kotoba-shell/app
 ;;
-;; This is the SINGLE itonami mobile manifest (ADR-0143). The Tauri app
-;; (`jp.co.gftd.itonami.mobile`) and the `dev.kotoba.itonami` iOS declaration
-;; in network-awai/cloud-itonami are superseded by it. The bundle it carries
-;; follows kotoba-lang/shinkansen docs/SHELL-BINDING.md.
+;; This is the SINGLE itonami kotoba-shell mobile manifest (ADR-0143). The old
+;; Tauri app (`jp.co.gftd.itonami.mobile`) and the `dev.kotoba.itonami` iOS
+;; declaration in network-awai/cloud-itonami are superseded by it. Owner
+;; decision 2026-11-17 (AWAI-3015) adds a separate Tauri v3 host in `tauri/`
+;; that carries the same `mobile/` bundle behind the consent broker; it does
+;; not replace this manifest. The bundle it carries follows
+;; kotoba-lang/shinkansen docs/SHELL-BINDING.md.
 ;;
 ;; There is no `:window` here. `:width`/`:height` are a desktop concept; a
 ;; phone gives the app the screen it has.
