@@ -1,0 +1,1 @@
+{"identifier":"cloud-itonami-local","description":"Read-only host info. No filesystem, shell, installer or HTTP plugin permission; network operations go through the consent broker in the page.","windows":["main"],"permissions":["allow-awai-host-info"]}
