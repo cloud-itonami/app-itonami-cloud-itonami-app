@@ -13,7 +13,7 @@
       "schedule_display": "40 7 * * *",
       "skill": null,
       "script": "itonami_evidence.py",
-      "base_url": "https://api.murakumo.cloud/v1",
+      "base_url": "https://openrouter.ai/api/v1",
       "name": "itonami-ingest-scout",
       "model_snapshot": null,
       "last_delivery_error": null,
@@ -44,11 +44,11 @@
       "workdir": "/Users/junkawasaki/.itonami-fleet/worktrees/itonami-growth-bot",
       "context_from": null,
       "monitor_script": null,
-      "provider": "murakumo",
+      "provider": "openrouter",
       "enabled": false,
       "created_at": "2026-08-31T13:26:30.698770+09:00",
       "monitor_url": null,
-      "model": "mishima",
+      "model": "xiaomi/mimo-v2.6-pro",
       "last_failure": {
         "at": "2026-10-18T14:15:59.404135+09:00",
         "detail": "RuntimeStoreError: invalid_params"
@@ -70,7 +70,7 @@
       "schedule_display": "40 8 * * *",
       "skill": null,
       "script": "itonami_evidence.py",
-      "base_url": "https://api.murakumo.cloud/v1",
+      "base_url": "https://openrouter.ai/api/v1",
       "name": "itonami-coverage-scout",
       "model_snapshot": null,
       "last_delivery_error": null,
@@ -101,11 +101,11 @@
       "workdir": "/Users/junkawasaki/.itonami-fleet/worktrees/itonami-growth-bot",
       "context_from": null,
       "monitor_script": null,
-      "provider": "murakumo",
+      "provider": "openrouter",
       "enabled": false,
       "created_at": "2026-08-31T13:26:36.933362+09:00",
       "monitor_url": null,
-      "model": "mishima",
+      "model": "xiaomi/mimo-v2.6-pro",
       "last_failure": {
         "at": "2026-10-18T14:16:00.202090+09:00",
         "detail": "RuntimeStoreError: invalid_params"
@@ -162,11 +162,11 @@
       "workdir": null,
       "context_from": null,
       "monitor_script": null,
-      "provider": "murakumo",
+      "provider": "openrouter",
       "enabled": false,
       "created_at": "2026-09-04T23:06:42.200198+09:00",
       "monitor_url": null,
-      "model": "mishima",
+      "model": "xiaomi/mimo-v2.6-pro",
       "last_failure": {
         "at": "2026-10-18T14:21:13.178888+09:00",
         "detail": "RuntimeError: Hermes can't reach the model provider. You may be offline. Check your internet connection and try again."
@@ -224,11 +224,11 @@
       "workdir": "/Users/junkawasaki/github/com-junkawasaki/root",
       "context_from": null,
       "monitor_script": null,
-      "provider": "murakumo",
+      "provider": "openrouter",
       "enabled": false,
       "created_at": "2026-09-04T23:20:04.242102+09:00",
       "monitor_url": null,
-      "model": "mishima",
+      "model": "xiaomi/mimo-v2.6-pro",
       "last_failure": {
         "at": "2026-10-18T14:21:13.194358+09:00",
         "detail": "RuntimeError: Hermes can't reach the model provider. You may be offline. Check your internet connection and try again."
@@ -288,11 +288,11 @@
         "self"
       ],
       "monitor_script": null,
-      "provider": "murakumo",
+      "provider": "openrouter",
       "enabled": false,
       "created_at": "2026-09-05T09:48:42.439085+09:00",
       "monitor_url": null,
-      "model": "mishima",
+      "model": "xiaomi/mimo-v2.6-pro",
       "last_failure": {
         "at": "2026-10-18T14:21:05.597943+09:00",
         "detail": "RuntimeError: Hermes can't reach the model provider. You may be offline. Check your internet connection and try again."
@@ -401,11 +401,11 @@
         "self"
       ],
       "monitor_script": null,
-      "provider": "murakumo",
+      "provider": "openrouter",
       "enabled": false,
       "created_at": "2026-09-05T16:28:06.585697+09:00",
       "monitor_url": null,
-      "model": "mishima",
+      "model": "xiaomi/mimo-v2.6-pro",
       "last_failure": {
         "at": "2026-10-18T14:21:13.824067+09:00",
         "detail": "RuntimeError: Hermes can't reach the model provider. You may be offline. Check your internet connection and try again."
@@ -454,11 +454,11 @@
         "self"
       ],
       "monitor_script": null,
-      "provider": "murakumo",
+      "provider": "openrouter",
       "enabled": false,
       "created_at": "2026-09-05T16:53:37.089396+09:00",
       "monitor_url": null,
-      "model": "mishima",
+      "model": "xiaomi/mimo-v2.6-pro",
       "last_dispatch": {
         "scheduled_at": "2026-10-16T10:00:00+09:00",
         "dispatched_at": "2026-10-18T14:15:59.218328+09:00",
@@ -512,11 +512,11 @@
       "workdir": null,
       "context_from": null,
       "monitor_script": null,
-      "provider": "murakumo",
+      "provider": "openrouter",
       "enabled": false,
       "created_at": "2026-09-10T17:16:44.113457+09:00",
       "monitor_url": null,
-      "model": "mishima",
+      "model": "xiaomi/mimo-v2.6-pro",
       "last_dispatch": {
         "scheduled_at": "2026-10-18T22:16:10.213646+09:00",
         "dispatched_at": "2026-10-18T22:17:10.676312+09:00",
@@ -570,11 +570,11 @@
       "workdir": null,
       "context_from": null,
       "monitor_script": null,
-      "provider": "murakumo",
+      "provider": "openrouter",
       "enabled": false,
       "created_at": "2026-09-10T17:35:51.834865+09:00",
       "monitor_url": null,
-      "model": "mishima",
+      "model": "xiaomi/mimo-v2.6-pro",
       "last_dispatch": {
         "scheduled_at": "2026-10-18T20:21:12.106618+09:00",
         "dispatched_at": "2026-10-18T20:22:11.961443+09:00",
