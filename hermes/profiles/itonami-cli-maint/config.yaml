@@ -1,7 +1,7 @@
 model:
-  provider: openrouter
-  base_url: https://openrouter.ai/api/v1
-  default: xiaomi/mimo-v2.6-pro
+  provider: awai-node
+  base_url: http://127.0.0.1:11434/v1
+  default: local
   max_tokens: 8192
   context_length: 131072
 plugins:
@@ -12,65 +12,62 @@ agent:
   run_budget_seconds: 600
 fallback_providers: []
 providers:
-  openrouter:
-    base_url: https://openrouter.ai/api/v1
+  awai-node:
+    base_url: http://127.0.0.1:11434/v1
     api_mode: chat_completions
-    key_env: OPENROUTER_API_KEY
     stale_timeout_seconds: 600
-    extra_headers:
-      HTTP-Referer: https://itonami.cloud
-      X-OpenRouter-Title: Itonami By KotobaLabs
+    request_timeout_seconds: 900
 auxiliary:
   free_only: true
   vision:
-    provider: murakumo
-    base_url: https://api.murakumo.cloud/v1
+    provider: awai-node
+    base_url: http://127.0.0.1:11434/v1
     model: qwen3-vl-2b-instruct
     reasoning_effort: none
     key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
     fallback_chain: []
   web_extract:
-    base_url: https://api.murakumo.cloud/v1
-    model: mishima
-    provider: murakumo
+    base_url: http://127.0.0.1:11434/v1
+    model: local
+    provider: awai-node
     key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
     fallback_chain: []
   compression:
-    base_url: https://api.murakumo.cloud/v1
-    model: mishima
-    provider: murakumo
+    base_url: http://127.0.0.1:11434/v1
+    model: local
+    provider: awai-node
     reasoning_effort: none
     key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
     fallback_chain: []
   skills_hub:
-    base_url: https://api.murakumo.cloud/v1
-    model: mishima
-    provider: murakumo
+    base_url: http://127.0.0.1:11434/v1
+    model: local
+    provider: awai-node
     key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
     fallback_chain: []
   approval:
-    base_url: https://api.murakumo.cloud/v1
-    model: mishima
-    provider: murakumo
+    base_url: http://127.0.0.1:11434/v1
+    model: local
+    provider: awai-node
     key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
     fallback_chain: []
   mcp:
-    base_url: https://api.murakumo.cloud/v1
-    model: mishima
-    provider: murakumo
+    base_url: http://127.0.0.1:11434/v1
+    model: local
+    provider: awai-node
     key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
     fallback_chain: []
   title_generation:
-    base_url: https://api.murakumo.cloud/v1
-    model: mishima
-    provider: murakumo
+    base_url: http://127.0.0.1:11434/v1
+    model: local
+    provider: awai-node
     reasoning_effort: none
     key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
     fallback_chain: []
   triage_specifier:
-    base_url: https://api.murakumo.cloud/v1
-    model: mishima
-    provider: murakumo
+    base_url: http://127.0.0.1:11434/v1
+    model: local
+    provider: awai-node
     key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
     fallback_chain: []
 cron:

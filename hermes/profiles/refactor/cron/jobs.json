@@ -23,17 +23,17 @@
       "workdir": null
     },
     {
-      "base_url": "https://openrouter.ai/api/v1",
+      "base_url": null,
       "context_from": null,
       "deliver": "local",
       "enabled": true,
       "enabled_toolsets": null,
       "id": "2c8ea6484c82",
-      "model": "xiaomi/mimo-v2.6-pro",
+      "model": null,
       "name": "refactor-land",
       "no_agent": false,
       "prompt": "refactor: SOUL.md を読んで 1 tick 実行せよ。scripts/kotoba_slice_measure.py を走らせ、候補があれば 1 本だけ .kotoba 化して着地（branch → gh api merges → worktree 削除）。候補 0 なら「0 候補」と正直に報告。SOUL.md の制約（他セッション WIP に触れない、値捏造なし、verify は amu check --jvm-free）を守れ。",
-      "provider": "openrouter",
+      "provider": null,
       "schedule": {
         "kind": "cron",
         "expr": "22 10 * * *",
