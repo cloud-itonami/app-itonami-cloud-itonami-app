@@ -1,7 +1,7 @@
 model:
-  provider: murakumo
-  base_url: https://api.murakumo.cloud/v1
-  default: mishima
+  provider: openrouter
+  base_url: https://openrouter.ai/api/v1
+  default: xiaomi/mimo-v2.6-pro
   max_tokens: 8192
   context_length: 131072
 fallback_providers: []
@@ -59,12 +59,14 @@ auxiliary:
     key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
     fallback_chain: []
 providers:
-  murakumo:
-    base_url: https://api.murakumo.cloud/v1
+  openrouter:
+    base_url: https://openrouter.ai/api/v1
     api_mode: chat_completions
+    key_env: OPENROUTER_API_KEY
     stale_timeout_seconds: 600
-    request_timeout_seconds: 900
-    key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
+    extra_headers:
+      HTTP-Referer: https://itonami.cloud
+      X-OpenRouter-Title: Itonami By KotobaLabs
 dashboard:
   turn_isolation: true
 context_file_max_chars: 120000

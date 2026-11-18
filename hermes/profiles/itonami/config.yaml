@@ -6,20 +6,6 @@ model:
   context_length: 1050000
   base_url: https://openrouter.ai/api/v1
 providers:
-  murakumo:
-    base_url: https://api.murakumo.cloud/v1
-    api_mode: chat_completions
-    key_env: MURAKUMO_API_TOKEN
-    models:
-      mishima:
-        context_length: 131072
-        max_tokens: 1024
-    stale_timeout_seconds: 600
-    request_timeout_seconds: 2000
-    extra_headers:
-      HTTP-Referer: https://itonami.cloud
-      X-OpenRouter-Title: Itonami By KotobaLabs
-      X-Title: Itonami By KotobaLabs
   openrouter-free:
     base_url: https://openrouter.ai/api/v1
     api_mode: chat_completions
@@ -51,6 +37,14 @@ providers:
         context_length: 262144
       qwen3.8-flash-next-whitehacker:
         context_length: 131072
+  openrouter:
+    base_url: https://openrouter.ai/api/v1
+    api_mode: chat_completions
+    key_env: OPENROUTER_API_KEY
+    stale_timeout_seconds: 600
+    extra_headers:
+      HTTP-Referer: https://itonami.cloud
+      X-OpenRouter-Title: Itonami By KotobaLabs
 fallback_providers: []
 agent:
   max_turns: 500
