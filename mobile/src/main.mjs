@@ -10,7 +10,9 @@ const API_BASE = __MOBILE_API_BASE__;
 const MAX_USER_EVENT_BYTES = 1024;
 const MAX_GUEST_EVENT_BYTES = 65536;
 const MAX_TERMINAL_RESPONSE_BYTES = 8192;
-const PAGE_LIMIT = 32;
+// A guest vector holds at most 32 items and the fleet list shares <main> with
+// the navigation, summary and notes, so a page is capped below 32 (AWAI-3015).
+const PAGE_LIMIT = 24;
 const container = document.getElementById("app");
 
 function mapValue(value, key) {
@@ -94,7 +96,15 @@ function encodedPathValue(value) {
     .replaceAll("*", "%2A");
 }
 
-let state = appModule.instantiateKotoba().init();
+// The compiled guest is metered per instance with a default fuel of 512, far
+// too small for the embedded 211-route command table (AWAI-3015). The budget
+// is a host decision, bounded, and does not widen any capability grant.
+const GUEST_BUDGETS = Object.freeze({ fuel: 400_000_000, frames: 4096 });
+function newGuest() {
+  return appModule.instantiateKotoba(Object.freeze({}), GUEST_BUDGETS);
+}
+
+let state = newGuest().init();
 let requestSequence = 0;
 let lastEffectId = 0n;
 let mounted = true;
@@ -122,7 +132,7 @@ function readFacets() {
 function dispatch(target, kind, value = "", limit = MAX_USER_EVENT_BYTES) {
   if (!mounted) return false;
   const bounded = clippedText(value, limit);
-  const guest = appModule.instantiateKotoba();
+  const guest = newGuest();
   const next = guest.step(state, target, kind, bounded);
   if (next === state) return false;
   renderWith(guest, next);
@@ -160,6 +170,16 @@ function projectActor(actor) {
         ? actor["authority-library"]["repo-name"] : "",
     },
   });
+}
+
+// The host may show one trusted consent dialog at a time and rejects a request
+// that arrives while another is waiting. Network reads therefore run one after
+// another instead of at the same time (AWAI-3015).
+let networkTail = Promise.resolve();
+function serialNetwork(task) {
+  const run = networkTail.then(task, task);
+  networkTail = run.catch(() => {});
+  return run;
 }
 
 async function loadFleet(effectId) {
@@ -255,13 +275,13 @@ function observeEffect(current) {
   if (effect === "terminal-request") {
     queueMicrotask(() => {
       if (mounted && integer(mapValue(state, "effect-id")) === effectId)
-        void sendTerminalRequest(effectId);
+        void serialNetwork(() => sendTerminalRequest(effectId));
     });
     return;
   }
   queueMicrotask(() => {
     if (mounted && integer(mapValue(state, "effect-id")) === effectId)
-      void loadFleet(effectId);
+      void serialNetwork(() => loadFleet(effectId));
   });
 }
 
@@ -384,7 +404,7 @@ window.addEventListener("kotobaShell:back", event => {
   }
 });
 
-renderWith(appModule.instantiateKotoba(), state);
+renderWith(newGuest(), state);
 let savedPairing = { base: "https://agent.itonami.cloud", token: "" };
 try {
   const parsed = JSON.parse(window.localStorage.getItem("cloud.itonami.mobile.pairing.v1") ?? "null");
@@ -395,4 +415,4 @@ try {
 }
 dispatch("host", "pairing", JSON.stringify(savedPairing), MAX_GUEST_EVENT_BYTES);
 observeEffect(state);
-void loadRoleFacets();
+void serialNetwork(loadRoleFacets);

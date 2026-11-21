@@ -70,7 +70,22 @@ const guestTemplate = fs.readFileSync(
   path.join(here, "src/cloud/itonami/mobile/app.kotoba"), "utf8");
 if (guestTemplate.split("__COMMAND_TABLES__").length !== 2)
   fail("Kotoba guest must contain exactly one __COMMAND_TABLES__ insertion point");
-const guestSource = guestTemplate.replace("__COMMAND_TABLES__", JSON.stringify(commandTablesSource));
+// The guest admits at most 32 items per vector and parses a long string very
+// slowly, so each table is embedded as a vector of short JSON-array chunks.
+const CHUNK_ENTRIES = 8;
+const MAX_CHUNKS = 32;
+function chunkedTable(entries) {
+  const chunks = [];
+  for (let i = 0; i < entries.length; i += CHUNK_ENTRIES)
+    chunks.push(JSON.stringify(JSON.stringify(entries.slice(i, i + CHUNK_ENTRIES))));
+  if (chunks.length > MAX_CHUNKS)
+    fail(`command table needs ${chunks.length} chunks; the guest admits ${MAX_CHUNKS}`);
+  return `(document-vector ${chunks.map(c => `(document-string ${c})`).join(" ")})`;
+}
+const guestSource = guestTemplate.replace("__COMMAND_TABLES__", () =>
+  `(document-map :routes ${chunkedTable(commandTables.routes)} `
+  + `:aliases ${chunkedTable(commandTables.aliases)} `
+  + `:host-side ${chunkedTable(commandTables.hostSide)})`);
 const generatedSource = path.join(target, "app.generated.kotoba");
 fs.writeFileSync(generatedSource, guestSource);
 const compiler = spawnSync(process.execPath, [

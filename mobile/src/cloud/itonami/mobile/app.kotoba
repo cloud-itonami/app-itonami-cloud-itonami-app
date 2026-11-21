@@ -167,7 +167,11 @@
    :authority-library (document-string (json-field authority "repoName"))
    :raw (document-string raw))))
 
-(defn embedded-command-tables [] :string __COMMAND_TABLES__)
+;; The build replaces the marker with a document-map of three vectors. Each
+;; vector holds short JSON-array chunks of the pinned command tables, because
+;; the compiled guest admits at most 32 items per vector and scanning one
+;; 80 KB string costs tens of seconds (AWAI-3015).
+(defn embedded-command-tables [] :document __COMMAND_TABLES__)
 
 (defn actors-from [raws :document i :i64 acc :document] :document
   (let [n (document-count raws)]
@@ -217,27 +221,25 @@
                                 :data-size (document-string "md")) text))
 
 (defn form-input [id :string label :string kind :string value :string placeholder :string target :string] :document
+  ;; The compiled guest admits a document at most 8 levels deep, and every
+  ;; element costs two levels (node plus children), so an input can sit no
+  ;; deeper than the fourth element. The former `dads-input-text` wrapper div
+  ;; therefore carries its class on the input itself (AWAI-3015).
   (el "div" (document-map :class (document-string "dads-form-control-label")
                           :data-size (document-string "md"))
       (document-vector
        (leaf "label" (document-map :class (document-string "dads-form-control-label__label")
                                    :for (document-string id)) label)
-       (el "div" (document-map :class (document-string "dads-input-text"))
-           (document-vector
-            (leaf "input" (document-map :data-k (document-string target)
-                                         :id (document-string id)
-                                         :type (document-string kind)
-                                         :class (document-string "dads-input-text__input")
-                                         :data-size (document-string "md")
-                                         :value (document-string value)
-                                         :placeholder (document-string placeholder)
-                                         :autocomplete (document-string "off")) ""))))))
+       (leaf "input" (document-map :data-k (document-string target)
+                                    :id (document-string id)
+                                    :type (document-string kind)
+                                    :class (document-string "dads-input-text dads-input-text__input")
+                                    :data-size (document-string "md")
+                                    :value (document-string value)
+                                    :placeholder (document-string placeholder)) ""))))
 
 (defn detail-pair [label :string value :string] :document
-  (el "div" (document-map :class (document-string "dds-ext-stack"))
-      (document-vector
-       (leaf "dt" (document-map :class (document-string "dads-form-control-label__label")) label)
-       (leaf "dd" (document-map) value))))
+  (leaf "p" (document-map) (string-concat label (string-concat "： " value))))
 
 (defn detail-row [actor :document index :i64] :document
   (cond
@@ -333,7 +335,7 @@
        (action-button "back" "← 一覧に戻る" "outline")
        (leaf "h1" (document-map) (if (= (string-byte-length (dstr (dget a :name))) 0)
                                     (dstr (dget a :repo)) (dstr (dget a :name))))
-       (el "dl" (document-map :class (document-string "dds-ext-stack"))
+       (el "div" (document-map :class (document-string "dds-ext-stack"))
            (detail-rows a 0 (document-vector)))
        (leaf "p" (document-map) "この内容は actor の blueprint が宣言しているものを、edge の目録からそのまま表示しています。")
        (action-button "back" "← 一覧に戻る" "outline"))))
@@ -349,28 +351,24 @@
                       (document-vector-conj
                        acc (leaf "option" (document-map :value (document-string value)) label))))))
 
+;; The label and the select are siblings: an option is a leaf at the fourth
+;; element level at the deepest, so the select cannot be wrapped (AWAI-3015).
+(defn role-label-view [state :document] :document
+  (if (= (document-count (dget state :roles)) 0) (leaf "span" (document-map) "")
+      (leaf "label" (document-map :class (document-string "dads-form-control-label__label")
+                                  :for (document-string "role")) "役割")))
+
 (defn role-select [state :document] :document
   (let [roles (dget state :roles)
         current (dstr (dget state :role))]
     (if (= (document-count roles) 0) (leaf "span" (document-map) "")
-        (el "div" (document-map :class (document-string "dads-form-control-label")
-                                :data-size (document-string "md"))
-            (document-vector
-             (leaf "label" (document-map :class (document-string "dads-form-control-label__label")
-                                         :for (document-string "role")) "役割")
-             (el "div" (document-map :class (document-string "dads-select"))
-                 (document-vector
-                  (el "div" (document-map :class (document-string "dads-select__control"))
-                      (document-vector
-                       (el "select" (document-map :id (document-string "role")
-                                                  :data-k (document-string "role")
-                                                  :value (document-string (if (= current "") "all" current))
-                                                  :class (document-string "dads-select__select")
-                                                  :data-size (document-string "md"))
-                           (document-vector-conj
-                            (document-vector (leaf "option" (document-map :value (document-string "all")) "すべての役割"))
-                            (role-options roles 0 (document-vector))))
-                       (leaf "span" (document-map :class (document-string "dads-select__chevron")) ""))))))))))
+        (el "select" (document-map :id (document-string "role")
+                                   :data-k (document-string "role")
+                                   :value (document-string (if (= current "") "all" current))
+                                   :class (document-string "dads-select__select")
+                                   :data-size (document-string "md"))
+            (role-options roles 0
+                          (document-vector (leaf "option" (document-map :value (document-string "all")) "すべての役割")))))))
 
 (defn matched-summary [state :document] :string
   (let [matched (dstr (dget state :matched))
@@ -392,44 +390,66 @@
                                           (string-concat total
                                                          (string-concat " 件中）。" clauses)))))))
 
-(defn fleet-view [state :document] :document
+;; The compiled guest admits a document at most 8 levels deep (two per
+;; element) and 32 items per vector. The fleet screen is therefore a flat list:
+;; the header section, then the summary, the cards and the notes as siblings
+;; under <main>, so a card (its text lines are leaves) sits at the second
+;; element level (AWAI-3015).
+(defn fleet-children [state :document] :document
   (let [phase (dstr (dget state :phase))
         query (dstr (dget state :query))
         actors (dget state :actors)
-        selected (dget state :selected)
         matched-count (decimal (dstr (dget state :matched)))
         shown-count (decimal (dstr (dget state :shown)))
         remaining (if (> matched-count shown-count) (- matched-count shown-count) 0)
-        n (document-count actors)]
-    (if (>= (decimal (dstr selected)) 0)
-      (actor-detail (dat actors (decimal (dstr selected))))
-      (el "section" (document-map :class (document-string "dds-ext-stack"))
-          (document-vector
-           (leaf "h1" (document-map) "営みフリート")
-           (leaf "p" (document-map) "cloud-itonami の actor 群を、blueprint が宣言している内容で引きます。")
-           (leaf "p" (document-map) "名前・領域・国コードなどで検索し、actor の宣言を確認できます。")
-           (form-input "q" "検索" "search" query "repo 名・領域・国コードなど" "query")
-           (role-select state)
-           (action-button "search" "検索" "solid-fill")
-           (if (= phase "loading")
-             (leaf "p" (document-map :role (document-string "status")) "フリートの目録を取得しています。")
-             (if (= phase "error")
-               (el "div" (document-map :role (document-string "alert")
-                                        :class (document-string "dads-notification-banner")
-                                        :data-type (document-string "error"))
+        n (document-count actors)
+        header (el "section" (document-map :class (document-string "dds-ext-stack"))
                    (document-vector
-                    (leaf "p" (document-map) "取得できませんでした")
-                    (leaf "p" (document-map) (dstr (dget state :error)))
-                    (action-button "retry" "再試行" "outline")))
-               (el "div" (document-map :class (document-string "dds-ext-stack"))
-                   (document-vector
-                    (leaf "p" (document-map) (matched-summary state))
-                    (actor-cards actors 0 n (document-vector))
-                    (if (> remaining 0)
-                      (leaf "p" (document-map) (string-concat "残り " (string-concat (string-from-i64 remaining) " 件は表示していません。条件を絞ってください。")))
-                      (leaf "span" (document-map) ""))
-                    (if (= n 0) (leaf "p" (document-map) "条件に一致する actor は見つかりませんでした。")
-                        (leaf "span" (document-map) "")))))))))))
+                    (leaf "h1" (document-map) "営みフリート")
+                    (leaf "p" (document-map) "cloud-itonami の actor 群を、blueprint が宣言している内容で引きます。")
+                    (leaf "p" (document-map) "名前・領域・国コードなどで検索し、actor の宣言を確認できます。")
+                    (form-input "q" "検索" "search" query "repo 名・領域・国コードなど" "query")
+                    (role-label-view state)
+                    (role-select state)
+                    (action-button "search" "検索" "solid-fill")
+                    (if (= phase "loading")
+                      (leaf "p" (document-map :role (document-string "status")) "フリートの目録を取得しています。")
+                      (if (= phase "error")
+                        (el "div" (document-map :role (document-string "alert")
+                                                 :class (document-string "dads-notification-banner")
+                                                 :data-type (document-string "error"))
+                            (document-vector
+                             (leaf "p" (document-map) "取得できませんでした")
+                             (leaf "p" (document-map) (dstr (dget state :error)))
+                             (action-button "retry" "再試行" "outline")))
+                        (leaf "span" (document-map) "")))))]
+    (if (or (= phase "loading") (= phase "error")) (document-vector header)
+        (fleet-tail
+         (actor-cards actors 0 n (document-vector header (leaf "p" (document-map) (matched-summary state))))
+         remaining n))))
+
+(defn fleet-tail [acc :document remaining :i64 n :i64] :document
+  (document-vector-conj
+   (if (> remaining 0)
+     (document-vector-conj
+      acc (leaf "p" (document-map) (string-concat "残り " (string-concat (string-from-i64 remaining) " 件は表示していません。条件を絞ってください。"))))
+     acc)
+   (if (= n 0) (leaf "p" (document-map) "条件に一致する actor は見つかりませんでした。")
+       (leaf "span" (document-map) ""))))
+
+(defn pane-children [state :document] :document
+  (let [pane (dstr (dget state :pane))
+        actors (dget state :actors)
+        selected-index (decimal (dstr (dget state :selected)))]
+    (cond
+      (= pane "about") (document-vector (about-view))
+      (= pane "terminal") (document-vector (terminal-view state))
+      (>= selected-index 0) (document-vector (actor-detail (dat actors selected-index)))
+      :else (fleet-children state))))
+
+(defn append-items [acc :document items :document i :i64] :document
+  (if (>= i (document-count items)) acc
+      (append-items (document-vector-conj acc (dat items i)) items (+ i 1))))
 
 (defn about-view [] :document
   (el "section" (document-map :class (document-string "dds-ext-stack"))
@@ -471,21 +491,17 @@
         status (dstr (dget entry :status))]
     (cond
       (string=? kind "sent") (leaf "p" (document-map) (string-concat "❯ " value))
-      (string=? kind "answered") (el "article" (document-map :class (document-string "dds-ext-stack"))
-                                     (document-vector (leaf "p" (document-map) (string-concat "HTTP " status))
-                                                      (leaf "pre" (document-map) value)))
-      (string=? kind "failed") (el "article" (document-map :role (document-string "alert"))
-                                  (document-vector (leaf "h2" (document-map) "届きませんでした")
-                                                   (leaf "p" (document-map) value)
-                                                   (leaf "p" (document-map) "サーバからの応答はありません。")))
-      (string=? kind "refused") (el "article" (document-map :role (document-string "status"))
-                                   (document-vector (leaf "h2" (document-map) "組み立てられませんでした")
-                                                    (leaf "p" (document-map) value)
-                                                    (leaf "p" (document-map) "サーバには問い合わせていません。")))
-      (string=? kind "unavailable") (el "article" (document-map :role (document-string "status"))
-                                       (document-vector (leaf "h2" (document-map) "この画面では実行できません")
-                                                        (leaf "p" (document-map) value)
-                                                        (leaf "p" (document-map) "サーバには問い合わせていません。")))
+      ;; Entries are single leaves: the transcript sits at the third element
+      ;; level and the guest admits no element deeper than the fourth
+      ;; (document depth 8, two levels per element), so the former article
+      ;; wrappers are folded into one text each (AWAI-3015).
+      (string=? kind "answered") (leaf "pre" (document-map) (string-concat (string-concat "HTTP " status) (string-concat "\n" value)))
+      (string=? kind "failed") (leaf "p" (document-map :role (document-string "alert"))
+                                     (string-concat "届きませんでした: " (string-concat value "（サーバからの応答はありません。）")))
+      (string=? kind "refused") (leaf "p" (document-map :role (document-string "status"))
+                                      (string-concat "組み立てられませんでした: " (string-concat value "（サーバには問い合わせていません。）")))
+      (string=? kind "unavailable") (leaf "p" (document-map :role (document-string "status"))
+                                          (string-concat "この画面では実行できません: " (string-concat value "（サーバには問い合わせていません。）")))
       :else (leaf "p" (document-map) value))))
 
 (defn terminal-submit-button [busy :string] :document
@@ -514,14 +530,16 @@
          (leaf "p" (document-map) (string-concat "接続先: " base))
          (if (string=? paired "true")
            (leaf "p" (document-map) "この端末は対になっています。")
-           (el "section" (document-map :class (document-string "dds-ext-stack"))
-               (document-vector
-                (leaf "p" (document-map :role (document-string "status"))
-                      "この端末はまだ対になっていません。base と token の両方があるまで、コマンドは送られません。")
-                (form-input "pair-base" "ingress" "url" base-draft "https://agent.itonami.cloud" "base-draft")
-                (form-input "pair-token" "token" "password" token-draft "この端末のための token" "token-draft")
-                (action-button "pair-save" "保存" "solid-fill")
-                (leaf "p" (document-map) "token はこの端末の中に保存されます。サーバへ送信するのは、コマンドを実行したときだけです。"))))
+           (leaf "p" (document-map :role (document-string "status"))
+                 "この端末はまだ対になっていません。base と token の両方があるまで、コマンドは送られません。"))
+         (if (string=? paired "true") (leaf "span" (document-map) "")
+             (form-input "pair-base" "ingress" "url" base-draft "https://agent.itonami.cloud" "base-draft"))
+         (if (string=? paired "true") (leaf "span" (document-map) "")
+             (form-input "pair-token" "token" "password" token-draft "この端末のための token" "token-draft"))
+         (if (string=? paired "true") (leaf "span" (document-map) "")
+             (action-button "pair-save" "保存" "solid-fill"))
+         (if (string=? paired "true") (leaf "span" (document-map) "")
+             (leaf "p" (document-map) "token はこの端末の中に保存されます。サーバへ送信するのは、コマンドを実行したときだけです。"))
          (leaf "p" (document-map) "読み取りは GET のみです。画面が許可する書き込みは ingress の3つの会話用パステンプレートに限られます。現在の表で使えるのは bots task です。")
          (if (= count 0) (leaf "p" (document-map) "コマンドを入力してください。例: bots list / commands bot")
              (el "div" (document-map :class (document-string "dds-ext-stack"))
@@ -534,8 +552,9 @@
         actors (dget state :actors)
         selected (dget state :selected)
         selected-index (decimal (dstr selected))]
-    (el "main" (document-map :class (document-string "dds-ext-container"))
-        (document-vector
+    (el "main" (document-map :class (document-string "dds-ext-container dds-ext-stack"))
+        (append-items
+         (document-vector
          (el "nav" (document-map :class (document-string "dds-ext-row"))
              (document-vector
               (leaf "button" (document-map :data-k (document-string "pane-fleet")
@@ -553,18 +572,14 @@
                                            :class (document-string "dads-button")
                                            :data-type (document-string (if (= pane "about") "solid-fill" "outline"))
                                            :data-size (document-string "md")) "情報")))
-         (cond
-           (= pane "about") (about-view)
-           (= pane "terminal") (terminal-view state)
-           (>= selected-index 0) (actor-detail (dat actors selected-index))
-           :else (fleet-view state))))))
+         )
+         (pane-children state) 0))))
 
 (defn init [] :document
-  (let [tables (embedded-command-tables)]
-  (document-map :routes (json-array-field tables "routes")
-                :aliases (json-array-field tables "aliases")
-                :host-side (json-array-field tables "hostSide")
-                :pane (document-string "fleet")
+  ;; The command tables stay out of the state: a guest document is capped at
+  ;; 64 KiB of text in total and the tables alone are most of that, so they are
+  ;; read from `embedded-command-tables` when a command is planned (AWAI-3015).
+  (document-map :pane (document-string "fleet")
                 :phase (document-string "loading")
                 :query (document-string "")
                 :applied-query (document-string "")
@@ -586,7 +601,7 @@
                 :line (document-string "")
                 :transcript (document-vector)
                 :effect (document-string "search")
-                :effect-id (document-i64 1))))
+                :effect-id (document-i64 1)))
 
 (defn issue-effect [state :document name :string] :document
   (let [current (option-value-of [:option :i64]
@@ -686,14 +701,37 @@
          (or (= whole-size prefix-size)
              (= (string-code-point-at whole prefix-size) 32)))))
 
-(defn choose-command [entries :document i :i64 text :string best :string best-size :i64] :string
-  (if (>= i (document-count entries)) best
-      (let [raw (dstr (dat entries i))
-            name (json-field raw "commandName")
-            size (decimal (host-count raw "commandCount"))]
-        (choose-command entries (+ i 1) text
-                        (if (and (> size best-size) (command-prefix? text name)) raw best)
-                        (if (and (> size best-size) (command-prefix? text name)) size best-size)))))
+(defn choose-command-from [s :string i :i64 n :i64 text :string best :string best-size :i64] :string
+  ;; Scan the raw JSON array text in place. The compiled guest caps a vector at
+  ;; 32 items, and the routed command table has 200+ entries, so it is never
+  ;; materialised as a document vector (AWAI-3015).
+  (let [a (skip-ws s i n)]
+    (if (or (>= a n) (= (string-code-point-at s a) 93)) best
+        (let [e (skip-value s a n)]
+          (if (< e 0) best
+              (let [raw (string-substring s a e)
+                    name (json-field raw "commandName")
+                    size (decimal (host-count raw "commandCount"))
+                    hit (and (> size best-size) (command-prefix? text name))
+                    next (skip-ws s e n)
+                    best-next (if hit raw best)
+                    size-next (if hit size best-size)]
+                (if (and (< next n) (= (string-code-point-at s next) 44))
+                  (choose-command-from s (+ next 1) n text best-next size-next)
+                  best-next)))))))
+
+(defn choose-command-chunks [chunks :document i :i64 text :string best :string] :string
+  (if (>= i (document-count chunks)) best
+      (let [table (dstr (dat chunks i))
+            n (string-byte-length table)
+            size (if (= (string-byte-length best) 0) 0
+                     (decimal (host-count best "commandCount")))]
+        (choose-command-chunks chunks (+ i 1) text
+                               (if (or (= n 0) (not= (string-code-point-at table 0) 91)) best
+                                   (choose-command-from table 1 n text best size))))))
+
+(defn choose-command [chunks :document text :string] :string
+  (choose-command-chunks chunks 0 text ""))
 
 (defn flag-value [flags :document name :string i :i64] :document
   (if (>= i (document-count flags)) (document-map :found (document-string "false") :value (document-string ""))
@@ -867,9 +905,10 @@
         positional (dget args :positional)
         flags (dget args :flags)
         name-text (join-strings positional 0 "" " ")
-        alias (choose-command (dget state :aliases) 0 name-text "" 0)
-        host-side (choose-command (dget state :host-side) 0 name-text "" 0)
-        route (choose-command (dget state :routes) 0 name-text "" 0)]
+        tables (embedded-command-tables)
+        alias (choose-command (dget tables :aliases) name-text)
+        host-side (choose-command (dget tables :host-side) name-text)
+        route (choose-command (dget tables :routes) name-text)]
     (cond
       (string=? (dstr (dget state :busy)) "true") state
       (= (document-count tokens) 0) state
