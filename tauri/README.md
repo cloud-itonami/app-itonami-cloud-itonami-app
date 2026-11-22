@@ -25,11 +25,17 @@ npm run build:desktop                  # native executable, no bundle/signing
 ## Distribution (`.app` + `.dmg`)
 
 `tauri.conf.json` enables bundling (`bundle.active=true`, targets `app`
-and `dmg`, `bundle.macOS.minimumSystemVersion: "14.0"`). The build,
+and `dmg`, `bundle.macOS.minimumSystemVersion: "14.0"` — the floor
+inherited from the existing `packaging/macos/Info.plist`; this app uses no
+macOS-14-only API, so 14.0 is parity with the kotoba-shell release, not a
+hard API dependency). The build,
 signing, notarization and verification procedure — including what is
 missing on the build host and the requirement that signing material never
 reaches CI — is [`docs/macos-distribution.md`](../docs/macos-distribution.md).
-Verify a built bundle with `scripts/verify-macos-bundle.sh`.
+Verify a built bundle with `scripts/verify-macos-bundle.sh` (default is
+CI mode; `--require-signature` / `--strict` for release judgment).
+Universal builds are blocked on the owner-approved
+`rustup target add x86_64-apple-darwin` and have not been built.
 
 ## Behavior changes versus the kotoba-shell host
 

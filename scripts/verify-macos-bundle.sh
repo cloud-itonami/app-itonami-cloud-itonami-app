@@ -4,30 +4,61 @@
 # The .app and the .dmg are signed separately (Tauri signs the .dmg file
 # itself, and notarization stapling applies to the .app contents and to the
 # .dmg file), so neither artifact's checks may substitute for the other's.
+# Each artifact's signature status is always reported explicitly; an
+# unsigned artifact never passes silently.
+#
+# Signature modes:
+#   Default (CI / local): an unsigned or ad-hoc artifact is a WARNING, so
+#     CI can verify structure on machines without a signing identity.
+#     A signature that EXISTS but fails codesign --verify is always a
+#     FAILURE (a broken signature is never OK).
+#   --require-signature (or CLOUD_ITONAMI_REQUIRE_SIGNATURE=1): release
+#     judgment mode. Unsigned or ad-hoc (non-Developer-ID) artifacts, a
+#     failed spctl assessment, and a missing staple are FAILUREs.
+#   --strict: implies --require-signature, and additionally requires a
+#     universal (arm64 + x86_64) .app executable.
 #
 # Usage:
-#   scripts/verify-macos-bundle.sh [--strict] [--app <path>] [--dmg <path>]
+#   scripts/verify-macos-bundle.sh [--require-signature] [--strict]
+#                                  [--app <path>] [--dmg <path>]
 #
 # Without --app/--dmg, the newest matching artifact under
 # tauri/src-tauri/target/*/release/bundle/macos is used.
-# Without --strict, a missing staple and a non-universal build are warnings.
-# With --strict, both are failures.
-#
 # Exit code: 0 when every required check passes, 1 otherwise.
 set -euo pipefail
 
 strict=0
+require_signature="${CLOUD_ITONAMI_REQUIRE_SIGNATURE:-0}"
 app_path=""
 dmg_path=""
 
 usage() {
-  echo "usage: $0 [--strict] [--app <path>] [--dmg <path>]" >&2
+  cat >&2 <<'EOF'
+usage: verify-macos-bundle.sh [--require-signature] [--strict] [--app <path>] [--dmg <path>]
+
+Modes (see header comment and docs/macos-distribution.md):
+  default              CI mode: unsigned/ad-hoc artifacts warn, exit 0 if
+                       structure is valid. A broken (but present) signature
+                       still fails.
+  --require-signature  Release mode: unsigned/ad-hoc, failed spctl, and
+                       missing staple all fail. Also enabled by
+                       CLOUD_ITONAMI_REQUIRE_SIGNATURE=1.
+  --strict             --require-signature plus universal (arm64+x86_64).
+
+.app and .dmg are judged separately; each artifact's signature status
+(signed / ad-hoc / unsigned) is always printed.
+EOF
 }
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --require-signature)
+      require_signature=1
+      shift
+      ;;
     --strict)
       strict=1
+      require_signature=1
       shift
       ;;
     --app)
@@ -49,6 +80,11 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+case "$require_signature" in
+  1|true|yes) require_signature=1 ;;
+  *) require_signature=0 ;;
+esac
 
 repo_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 bundle_root="$repo_root/tauri/src-tauri/target"
@@ -85,7 +121,19 @@ fail() {
   failures=$((failures + 1))
 }
 
-warn_or_fail() {
+# Mode-dependent outcome for signature-related findings: failure in
+# --require-signature / --strict mode, warning in default (CI) mode.
+warn_or_fail_signature() {
+  if [[ "$require_signature" -eq 1 ]]; then
+    fail "$1"
+  else
+    printf 'WARN: %s\n' "$1" >&2
+  fi
+}
+
+# Mode-dependent outcome for architecture findings: failure only in
+# --strict mode (universal is required for release, not for CI).
+warn_or_fail_arch() {
   if [[ "$strict" -eq 1 ]]; then
     fail "$1"
   else
@@ -93,13 +141,61 @@ warn_or_fail() {
   fi
 }
 
-check_staple() {
-  # $1 = path. A missing staple is a warning unless --strict.
+# signature_status <path>: prints one of signed|adhoc|unsigned.
+signature_status() {
   local target="$1"
-  if xcrun stapler validate "$target" >/dev/null 2>&1; then
-    printf 'OK: stapled: %s\n' "$target"
+  local dv
+  dv="$(/usr/bin/codesign -dv --verbose=4 "$target" 2>&1 || true)"
+  if [[ "$dv" == *"Signature=adhoc"* ]]; then
+    printf 'adhoc'
+  elif [[ "$dv" == *"Authority="* && "$dv" == *"Identifier="* ]]; then
+    printf 'signed'
   else
-    warn_or_fail "not stapled (run: xcrun stapler staple \"$target\"): $target"
+    printf 'unsigned'
+  fi
+}
+
+# check_signature <label> <path> <codesign --verify args...>: reports the
+# artifact's signature status explicitly, then enforces it per mode.
+# A present-but-broken signature fails in every mode; a missing or ad-hoc
+# signature follows --require-signature.
+check_signature() {
+  local label="$1"
+  local target="$2"
+  shift 2
+
+  local status
+  status="$(signature_status "$target")"
+  /usr/bin/codesign -dv --verbose=4 "$target" 2>&1 | \
+    /usr/bin/sed -n '/^Identifier=/p;/^Authority=/p;/^TeamIdentifier=/p' || true
+  printf 'INFO: signature (%s): %s\n' "$label" "$status"
+
+  case "$status" in
+    signed)
+      if /usr/bin/codesign --verify "$@" "$target" 2>&1; then
+        printf 'OK: codesign verify (%s)\n' "$label"
+      else
+        fail "codesign --verify ($label): signature present but invalid"
+      fi
+      ;;
+    adhoc)
+      warn_or_fail_signature "($label) ad-hoc signature only, not Developer ID: $target"
+      ;;
+    *)
+      warn_or_fail_signature "($label) unsigned: $target (run the signing build, or keep CI/default mode)"
+      ;;
+  esac
+}
+
+# check_staple <label> <path>: a missing staple follows signature mode
+# (release judgment needs the notarization ticket stapled).
+check_staple() {
+  local label="$1"
+  local target="$2"
+  if xcrun stapler validate "$target" >/dev/null 2>&1; then
+    printf 'OK: stapled (%s): %s\n' "$label" "$target"
+  else
+    warn_or_fail_signature "not stapled ($label) (run: xcrun stapler staple \"$target\"): $target"
   fi
 }
 
@@ -142,26 +238,30 @@ verify_app() {
     if [[ "$archs" == *"arm64"* && "$archs" == *"x86_64"* ]]; then
       printf 'OK: universal (arm64 + x86_64)\n'
     else
-      warn_or_fail "not universal (expected arm64 and x86_64, got: ${archs:-<none>})"
+      warn_or_fail_arch "not universal (expected arm64 and x86_64, got: ${archs:-<none>})"
     fi
   else
     fail "main executable not found: Contents/MacOS/${executable:-<unknown>}"
   fi
 
-  if /usr/bin/codesign --verify --deep --strict --verbose=2 "$app" 2>&1; then
-    printf 'OK: codesign verify (app)\n'
-  else
-    fail "codesign --verify --deep --strict (app)"
-  fi
-  /usr/bin/codesign -dv --verbose=4 "$app" 2>&1 | /usr/bin/sed -n '/^Identifier=/p;/^Authority=/p;/^TeamIdentifier=/p' || true
+  check_signature "app" "$app" --deep --strict --verbose=2
 
-  if /usr/sbin/spctl --assess --type execute --verbose=2 "$app" 2>&1; then
-    printf 'OK: spctl assess (app)\n'
+  # spctl policy applies to executable bundles; an unsigned artifact is
+  # handled by the signature mode above, so its spctl result is reported
+  # (never hidden) but only judged in --require-signature / --strict mode.
+  if [[ "$(signature_status "$app")" == "signed" ]]; then
+    if /usr/sbin/spctl --assess --type execute --verbose=2 "$app" 2>&1; then
+      printf 'OK: spctl assess (app)\n'
+    elif [[ "$require_signature" -eq 1 ]]; then
+      fail "spctl --assess --type execute (app)"
+    else
+      printf 'WARN: spctl --assess --type execute (app)\n' >&2
+    fi
   else
-    fail "spctl --assess --type execute (app)"
+    printf 'INFO: spctl: skipped (app is not signed; see signature status above, never silent)\n'
   fi
 
-  check_staple "$app"
+  check_staple "app" "$app"
 }
 
 verify_dmg() {
@@ -179,14 +279,9 @@ verify_dmg() {
   fi
 
   # The .dmg is signed as its own file; the .app signature does not cover it.
-  if /usr/bin/codesign --verify --verbose=2 "$dmg" 2>&1; then
-    printf 'OK: codesign verify (dmg)\n'
-  else
-    fail "codesign --verify (dmg)"
-  fi
-  /usr/bin/codesign -dv --verbose=4 "$dmg" 2>&1 | /usr/bin/sed -n '/^Identifier=/p;/^Authority=/p;/^TeamIdentifier=/p' || true
+  check_signature "dmg" "$dmg" --verbose=2
 
-  check_staple "$dmg"
+  check_staple "dmg" "$dmg"
 
   # Inspect the contents read-only, then detach. The mountpoint is a fresh
   # temp dir and is removed on exit even if a check fails.
@@ -230,4 +325,11 @@ if [[ "$failures" -gt 0 ]]; then
   printf 'verify-macos-bundle: %s check(s) failed\n' "$failures" >&2
   exit 1
 fi
-printf 'verify-macos-bundle: all required checks passed%s\n' "$(if [[ "$strict" -eq 1 ]]; then printf ' (strict)'; fi)"
+mode="CI (default; unsigned artifacts warn)"
+if [[ "$require_signature" -eq 1 ]]; then
+  mode="require-signature"
+fi
+if [[ "$strict" -eq 1 ]]; then
+  mode="strict (require-signature + universal)"
+fi
+printf 'verify-macos-bundle: all required checks passed [%s]\n' "$mode"

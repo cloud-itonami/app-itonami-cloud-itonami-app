@@ -65,8 +65,12 @@ The committed config enables bundling:
 ```
 
 - `minimumSystemVersion: "14.0"` is explicit because Tauri's default is
-  `10.13`, and the existing macOS release `packaging/macos/Info.plist`
-  already declares `LSMinimumSystemVersion 14.0`. The two agree.
+  `10.13`. Rationale: this host uses no macOS-14-only API (WKWebView APIs
+  available since ≤ 10.13; Tauri's 14.0+ WebView features such as
+  background-throttling and data-store-identifier are optional and unused),
+  so 14.0 is kept as the distribution floor inherited from the existing
+  release `packaging/macos/Info.plist` (`LSMinimumSystemVersion 14.0`, since
+  `dcf4e0ca`) — parity with the kotoba-shell host, not a hard API dependency.
 - `identifier` (`cloud.itonami.app`) and `version` (`0.4.2`) in
   `tauri.conf.json` agree with `tauri/src-tauri/Cargo.toml` and
   `tauri/package.json`. `packaging/macos/Info.plist` is the kotoba-shell
@@ -104,8 +108,12 @@ JP_GO_DDS=/path/to/pinned/jp-go-digital-design-system \
   npm run build
 cd ../tauri && npm ci && npm run build   # writes tauri/dist
 
-# 3. Universal .app + .dmg. Uses tauri.conf.json (bundle.active=true,
-#    targets ["app","dmg"]) and signs when an identity is available:
+# 3a. Today: aarch64 single-arch .app + .dmg (this host's ceiling):
+APPLE_SIGNING_IDENTITY='Developer ID Application: ...' \
+  npx tauri build --bundles app,dmg
+
+# 3b. Universal (arm64 + x86_64) — BLOCKED until step 1 is owner-approved
+#     and run. It has NOT been built and must not be described as done:
 APPLE_SIGNING_IDENTITY='Developer ID Application: ...' \
   npx tauri build --target universal-apple-darwin --bundles app,dmg
 ```
@@ -125,19 +133,33 @@ xcrun stapler staple 'Cloud Itonami.app'
 (the `.dmg` signature and staple do not follow from the `.app`'s):
 
 ```sh
-scripts/verify-macos-bundle.sh            # auto-discovers the newest bundle
-scripts/verify-macos-bundle.sh --strict   # missing staple / non-universal = failure
+scripts/verify-macos-bundle.sh               # auto-discovers the newest bundle (CI mode)
+scripts/verify-macos-bundle.sh --require-signature  # release mode: unsigned/ad-hoc/staple-missing = failure
+scripts/verify-macos-bundle.sh --strict      # require-signature + universal (arm64+x86_64) required
 scripts/verify-macos-bundle.sh --app 'path/to/Cloud Itonami.app' --dmg 'path/to/Cloud-Itonami.dmg'
+scripts/verify-macos-bundle.sh --help        # full flag and mode reference
 ```
 
 It validates `CFBundleIdentifier`, `CFBundleShortVersionString` and
 `LSMinimumSystemVersion` from the bundle's `Info.plist`, runs
-`lipo -archs` on the main executable (expects `arm64` + `x86_64` for a
-universal build), `codesign --verify` on both the `.app` and the `.dmg`,
-`spctl --assess --type execute` on the `.app`, `xcrun stapler validate` on
-both, and `hdiutil verify` plus a read-only attach → list → detach of the
-`.dmg` contents. A missing staple is a warning by default and a failure
-under `--strict`.
+`lipo -archs` on the main executable, `codesign --verify` on both the
+`.app` and the `.dmg`, `spctl --assess --type execute` on the `.app`,
+`xcrun stapler validate` on both, and `hdiutil verify` plus a read-only
+attach → list → detach of the `.dmg` contents.
+
+Signature judgment is per artifact and never silent: each of `.app` and
+`.dmg` gets its own `INFO: signature (...): signed|adhoc|unsigned` line,
+so one artifact passing cannot mask the other failing.
+
+| Mode | Flag / env | Unsigned or ad-hoc | Broken (present) signature | Missing staple | Non-universal |
+| --- | --- | --- | --- | --- | --- |
+| CI (default) | *(none)* | WARN, exit 0 | FAIL | WARN | WARN |
+| Release | `--require-signature` or `CLOUD_ITONAMI_REQUIRE_SIGNATURE=1` | FAIL | FAIL | FAIL | WARN |
+| Release + universal | `--strict` | FAIL | FAIL | FAIL | FAIL |
+
+Use the default in CI (no signing identity on runners) and
+`--require-signature` (or `--strict` for universal release builds) for the
+release decision. A present-but-broken signature fails in every mode.
 
 The same checks can be run by hand:
 
@@ -159,6 +181,22 @@ hdiutil attach -readonly -nobrowse -mountpoint "$MOUNT" 'Cloud-Itonami-0.4.2.dmg
 ls -la "$MOUNT"
 hdiutil detach "$MOUNT"; rmdir "$MOUNT"
 ```
+
+## What can and cannot be built today
+
+- **Universal (arm64 + x86_64) cannot be built on this host today** and has
+  not been built: the `x86_64-apple-darwin` target is not installed, adding
+  it needs owner approval (see [Required material](#required-material)),
+  and it has not been run. The configuration already allows universal
+  builds (`--target universal-apple-darwin`), but no universal artifact
+  exists and none is claimed anywhere.
+- **The current ceiling is an aarch64 single-arch `.app` / `.dmg`**
+  (`npx tauri build --bundles app,dmg`), which the verify script checks
+  with warnings for non-universal archs in CI mode. Even that requires a
+  complete `mobile/dist` (see blockers below), which this host cannot
+  produce yet, so the only verification actually executed so far is the
+  script's own behavior on synthetic artifacts: default mode exits 0 with
+  explicit unsigned warnings, `--require-signature` exits 1, per artifact.
 
 ## Known blockers for a full build (rechecked on `origin/main` @ `8e0681b7`)
 
