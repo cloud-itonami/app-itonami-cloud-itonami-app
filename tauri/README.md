@@ -22,6 +22,15 @@ npm run build                          # tauri/dist from mobile/dist
 npm run build:desktop                  # native executable, no bundle/signing
 ```
 
+## Distribution (`.app` + `.dmg`)
+
+`tauri.conf.json` enables bundling (`bundle.active=true`, targets `app`
+and `dmg`, `bundle.macOS.minimumSystemVersion: "14.0"`). The build,
+signing, notarization and verification procedure — including what is
+missing on the build host and the requirement that signing material never
+reaches CI — is [`docs/macos-distribution.md`](../docs/macos-distribution.md).
+Verify a built bundle with `scripts/verify-macos-bundle.sh`.
+
 ## Behavior changes versus the kotoba-shell host
 
 - Every request that leaves the app now shows the consent dialog (service, endpoint, method/path, data categories) and needs a click. The shell host sent them directly.
