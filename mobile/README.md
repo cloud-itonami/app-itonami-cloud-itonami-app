@@ -89,13 +89,16 @@ cd mobile
 npm ci
 AMU_ROOT=/path/to/pinned/amu \
 KBB_ENGINE_ROOT=/path/to/pinned/amu-engine \
-JP_GO_DDS=/path/to/pinned/jp-go-digital-design-system \
+JP_GO_DDS=/path/to/pinned/kotoba \
 npm run build
 ```
 
 `amu.lock` pins the Amu compiler and browser host runtime. `engine.lock` pins
 the engine Amu uses to run its compiler. `dds.lock` pins the DADS source
-revision and stylesheet hash. `commands.lock` pins the mobile command-table
+revision and stylesheet hash. The canonical source is the kotoba monorepo
+(`kotoba-lang/kotoba`, `lib/kotoba.jpGoDigitalDesignSystem/resources/jp_go_dds/dds.css`):
+the standalone `jp-go-digital-design-system` repository no longer resolves, so
+`JP_GO_DDS` must point at a kotoba checkout at the pinned revision (AWAI-3015). `commands.lock` pins the mobile command-table
 snapshot. The build copies the DADS stylesheet, checks the committed HTML
 template, compiles `app.kotoba` with `--target js-kotoba-v1 --jvm-free`, copies
 the pinned browser host runtime, and audits the generated bundle and viewport.
@@ -219,7 +222,7 @@ shell's cancelable `kotobaShell:back`: detail → list, コマンド / 情報 �
 npm ci
 AMU_ROOT=/path/to/pinned/amu \
 KBB_ENGINE_ROOT=/path/to/pinned/amu-engine \
-JP_GO_DDS=/path/to/pinned/jp-go-digital-design-system \
+JP_GO_DDS=/path/to/pinned/kotoba \
 npm run build
 ```
 

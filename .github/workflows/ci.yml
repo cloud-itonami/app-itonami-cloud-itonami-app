@@ -113,7 +113,10 @@ jobs:
       - name: Install repo-pinned nbb
         run: npm ci --no-audit --no-fund
       - name: Test nbb host entrypoint + plugin packaging
-        run: NBB=$PWD/node_modules/.bin/nbb node --test test/itonami-mcp-ui.test.mjs test/plugin-packaging.test.mjs
+        # test/dds-pin.test.mjs is the AWAI-3015 pin-resolution guard: it
+        # fetches mobile/dds.lock's canonical revision from GitHub (no
+        # secrets) and fails if it 404s or the bytes drift from sha256.
+        run: NBB=$PWD/node_modules/.bin/nbb node --test test/itonami-mcp-ui.test.mjs test/plugin-packaging.test.mjs test/dds-pin.test.mjs
 
   # Smoke-tests the Windows launch path end to end: kbb + engine + guest-wasm
   # server, first-boot health on 1338. This is the run path the resident
