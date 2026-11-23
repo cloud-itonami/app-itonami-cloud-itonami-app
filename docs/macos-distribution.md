@@ -20,9 +20,11 @@ commands are in [Build steps](#build-steps-local-mac-after-the-prerequisites-abo
 the release check is in [Verify a built `.app` and `.dmg`](#verify-a-built-app-and-dmg).
 This section is the GO-day checklist and the only signing/notarization
 procedure to follow. Signing and notarization have not been executed
-(this Mac's keychain has 0 signing identities; the owner installs the
-certificate first). `rustup target add` was executed after condition ③
-was met (GO); the `df` record is in PR #474.
+because the premise is absent — no Developer ID Application certificate
+is in this Mac's keychain (0 signing identities), so there is nothing to
+sign with yet; the owner installs the certificate first.
+`x86_64-apple-darwin` is already installed, so no `rustup target add` is
+needed (evidence in PR #474).
 
 ### GO checklist: 3 conditions
 
@@ -37,20 +39,19 @@ order can run. The commands are the self-checks; do not rely on memory.
   certificate uses no disk capacity, so this can be done before condition ③
   is met.
 - [ ] **② `rustup target add x86_64-apple-darwin` approved (owner task).**
-  Owner approval is required because this downloads a toolchain component
-  (~1 GB). Approval itself is a decision and uses no disk; execution
-  (step ② of the GO-day order) happens only after condition ③ is met and
-  the free space is rechecked. Self-check: before GO,
-  `~/.cargo/bin/rustup target list --installed` must *not* list
-  `x86_64-apple-darwin`; after the GO-day execution it must list it.
-  Do not run it unattended.
+  Owner approval is required *if* an add is needed, because it downloads a
+  toolchain component (~1 GB). On GO, `~/.cargo/bin/rustup target list
+  --installed` already listed `x86_64-apple-darwin`, so no add was needed
+  (a rerun reports `component ... is up to date`; evidence in PR #474). If
+  the target were missing, `rustup target add` would still need owner
+  approval and condition ③ first; do not run it unattended.
 - [ ] **③ Free space recovered.** Self-check: `df -h /System/Volumes/Data`.
-  Confirm comfortably more than ~1 GB is free before running
+  Confirm comfortably more than ~1 GB is free before any
   `rustup target add` (several GiB free is the practical target, so the
   ~1 GB download plus the universal build have room). On GO (2026-11-23)
-  this was met (83% used) and step ② was executed; the post-install
-  `df` ×3 record, with its minimum as the condition-③ record, is listed
-  in PR #474. Recheck with `df -h` before any future reinstall.
+  this was met (83% used); the `df` ×3 record (2026-11-23T00:41:04Z–
+  00:42:04Z, minimum as the condition-③ record) is listed in PR #474.
+  Recheck with `df -h` before any future add.
 
 Conditions ① and ② (decision/registration only) may be completed before
 condition ③, because they use no capacity. The `rustup target add` execution
@@ -60,10 +61,11 @@ itself must wait for ③.
 
 1. **Confirm the certificate.** `security find-identity -v -p codesigning`
    shows the Developer ID Application identity (checklist condition ①).
-2. **Add the Rust target after approval.** Recheck free space with
-   `df -h /System/Volumes/Data` (~1 GB premise, checklist conditions ②③),
-   then run `~/.cargo/bin/rustup target add x86_64-apple-darwin` and confirm
-   it with `~/.cargo/bin/rustup target list --installed`.
+2. **Confirm (or, if missing and approved, add) the Rust target.** Recheck
+   free space with `df -h /System/Volumes/Data` only if an add might be
+   needed (~1 GB premise, checklist conditions ②③), and confirm
+   `~/.cargo/bin/rustup target list --installed` lists `x86_64-apple-darwin`.
+   On GO it was already installed, so no add was needed.
 3. **Universal build.** Build `arm64 + x86_64` with `npx tauri build
    --target universal-apple-darwin --bundles app,dmg` and
    `APPLE_SIGNING_IDENTITY` set on the signing Mac (see
@@ -91,20 +93,31 @@ Verification with `codesign --verify --deep` is read-only and is fine — the
 verify script uses `--deep` to *check*, never to sign. `--entitlements` is
 omitted (empty; see below) so the hardened-runtime defaults apply.
 
-After signing, save the effective entitlements to a local evidence file
-(never committed to git) so the empty-entitlements decision is provable
-by diff — whether anything was added or nothing was added shows in the
-saved output:
+Prove that the empty-entitlements decision holds *before* any Developer ID
+certificate is available, using an ad-hoc signature (local evidence only —
+an ad-hoc build must never be distributed; `codesign -d` fails on an
+unsigned bundle, so ad-hoc signing is needed to reach the entitlements
+dump at all):
 
 ```sh
-codesign -d --entitlements :- 'Cloud Itonami.app' > entitlements.after-signing.txt
-codesign -d --entitlements :- 'Cloud-Itonami-0.4.2.dmg' > entitlements-dmg.after-signing.txt
+# (a) ad-hoc sign for local proof only (not for distribution):
+codesign -s - --force --deep 'Cloud Itonami.app'
+
+# (b) dump entitlements; empty output is the evidence (save outside repo):
+codesign -d --entitlements :- 'Cloud Itonami.app' > entitlements.adhoc-evidence.txt
+
+# (c) save the signature identity lines:
+codesign -dvvv 'Cloud Itonami.app' > codesign-adhoc.txt
 ```
 
-Keep these files outside the repository (local evidence only). On later
-builds, compare the new dump against the saved one (`diff`); any added
-entitlement appears as a difference, and an unchanged file proves that
-nothing was added.
+`--deep` is used here only for this throwaway ad-hoc proof; for Developer ID
+release signing above, `--deep` must still not be used (see previous
+paragraph). Expected results: (b) produces empty output (an empty saved
+file proves there are no entitlements); (c) shows a `Signature=adhoc` line
+plus the `Authority=` line(s). Keep the saved files outside the repository
+(local evidence only, never committed). (d) No entitlements are declared:
+`tauri.conf.json` has no `bundle.macOS.entitlements` entry and this
+repository contains no `entitlements.plist` file.
 
 ### Notarize, staple, and verify
 
@@ -137,9 +150,9 @@ universal `arm64 + x86_64` binary. See the full mode table in
 Entitlements are shipped empty on purpose: the hardened-runtime defaults
 are sufficient, the WKWebView runs in a separate process, and this host has
 no Tauri/wasm/JIT code that needs an executable-memory or JIT entitlement.
-After signing, save the `codesign -d --entitlements :-` dump as shown in
-[Manual signing](#manual-signing-what-tauri-does-internally) so whether
-anything was later added is provable by diff, then launch the app and
+Prove emptiness with the ad-hoc steps in
+[Manual signing](#manual-signing-what-tauri-does-internally) (local only,
+before any Developer ID certificate exists), then launch the app and
 confirm normal operation; if a future capability proves insufficient,
 add only the smallest missing entitlement.
 The committed `tauri.conf.json` omission is detailed in
