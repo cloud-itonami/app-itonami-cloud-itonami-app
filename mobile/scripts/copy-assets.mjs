@@ -18,7 +18,7 @@ function fail(message) {
   process.exit(1);
 }
 
-if (!sourceRoot) fail("set JP_GO_DDS to the checkout pinned in mobile/dds.lock");
+if (!sourceRoot) fail("set JP_GO_DDS to the kotoba monorepo checkout pinned in mobile/dds.lock (kotoba-lang/kotoba)");
 const revision = spawnSync("git", ["-C", sourceRoot, "rev-parse", "HEAD"], { encoding: "utf8" });
 if (revision.status !== 0) fail(`cannot read DADS checkout revision: ${revision.stderr.trim()}`);
 if (revision.stdout.trim() !== lock.revision)
