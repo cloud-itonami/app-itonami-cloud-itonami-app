@@ -171,15 +171,13 @@ The committed `tauri.conf.json` omission is detailed in
 
 ## Current state of this host (2026-11-23) — 初回計測（時点つき）
 
-初回計測（時点つき）: This table is the point-in-time record of the first measurement only; later GO confirmations above supersede it and are not reflected here.
-
 Signing and notarization **cannot run on this host yet**. The four missing
 pieces are independent of each other:
 
 | # | State | How it was checked |
 | --- | ----- | ------------------ |
 | 1 | No code-signing identity: 0 valid identities | `security find-identity -v -p codesigning` |
-| 2 | `x86_64-apple-darwin` Rust target not installed (only `aarch64-apple-darwin` plus Android targets) (as of the first measurement, before the target was confirmed installed — see the GO checklist above) | `~/.cargo/bin/rustup target list --installed` |
+| 2 | `x86_64-apple-darwin` Rust target not installed (only `aarch64-apple-darwin` plus Android targets) (as of 2026-11-21, before the target was confirmed installed) | `~/.cargo/bin/rustup target list --installed` |
 | 3 | No `notarytool` keychain profile exists | `xcrun notarytool history` / `security find-generic-password` (nothing created) |
 | 4 | Xcode application not installed (Command Line Tools only) | `xcode-select -p` → `/Library/Developer/CommandLineTools` |
 
