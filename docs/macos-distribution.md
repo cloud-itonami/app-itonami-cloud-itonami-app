@@ -38,34 +38,42 @@ order can run. The commands are the self-checks; do not rely on memory.
   Application identity with a valid count ≥ 1. Installing/identifying a
   certificate uses no disk capacity, so this can be done before condition ③
   is met.
-- [ ] **② `rustup target add x86_64-apple-darwin` approved (owner task).**
-  Owner approval is required *if* an add is needed, because it downloads a
-  toolchain component (~1 GB). On GO, `~/.cargo/bin/rustup target list
-  --installed` already listed `x86_64-apple-darwin`, so no add was needed
-  (a rerun reports `component ... is up to date`; evidence in PR #474). If
-  the target were missing, `rustup target add` would still need owner
-  approval and condition ③ first; do not run it unattended.
-- [ ] **③ Free space recovered.** Self-check: `df -h /System/Volumes/Data`.
-  Confirm comfortably more than ~1 GB is free before any
-  `rustup target add` (several GiB free is the practical target, so the
-  ~1 GB download plus the universal build have room). On GO (2026-11-23)
-  this was met (83% used); the `df` ×3 record (2026-11-23T00:41:04Z–
-  00:42:04Z, minimum as the condition-③ record) is listed in PR #474.
-  Recheck with `df -h` before any future add.
+- [ ] **② `x86_64-apple-darwin` listed (confirmed; no add, no rerun needed).**
+  Confirmation only: `~/.cargo/bin/rustup target list --installed` lists
+  `x86_64-apple-darwin` (see output below; a rerun reports `component ...
+  is up to date` and is not needed). Correction: a no-op rerun was executed
+  previously; the record is corrected to confirmation only — no `rustup
+  target add` is run for this condition.
 
-Conditions ① and ② (decision/registration only) may be completed before
-condition ③, because they use no capacity. The `rustup target add` execution
-itself must wait for ③.
+```text
+$ ~/.cargo/bin/rustup target list --installed
+aarch64-apple-darwin
+aarch64-linux-android
+armv7-linux-androideabi
+i686-linux-android
+x86_64-apple-darwin
+x86_64-linux-android
+```
+- [ ] **③ Free space recovered.** Self-check: `df -h /System/Volumes/Data`.
+  If an add were ever needed, confirm comfortably more than ~1 GB is free
+  (several GiB free is the practical target, so the ~1 GB download plus
+  the universal build have room). Re-measured 2026-11-23T11:05:02+0900 to
+  11:06:02+0900 (30 s interval): 41 Gi avail (78%), 41 Gi (78%), 40 Gi
+  (79%). The minimum (2026-11-23T11:06:02+0900, 42045068 1K-blocks) is the
+  condition-③ record; full `df` output is in PR #474. State the 3 values
+  as recorded.
+
+Condition ① (certificate install) may be completed before condition ③,
+because it uses no capacity. Condition ② is already satisfied (target
+listed), so no execution waits on ③.
 
 ### GO-day order
 
 1. **Confirm the certificate.** `security find-identity -v -p codesigning`
    shows the Developer ID Application identity (checklist condition ①).
-2. **Confirm (or, if missing and approved, add) the Rust target.** Recheck
-   free space with `df -h /System/Volumes/Data` only if an add might be
-   needed (~1 GB premise, checklist conditions ②③), and confirm
-   `~/.cargo/bin/rustup target list --installed` lists `x86_64-apple-darwin`.
-   On GO it was already installed, so no add was needed.
+2. **Confirm the Rust target is listed.** `~/.cargo/bin/rustup target list
+   --installed` lists `x86_64-apple-darwin` (checklist condition ②; already
+   listed on GO — confirmation only, no add, no rerun needed).
 3. **Universal build.** Build `arm64 + x86_64` with `npx tauri build
    --target universal-apple-darwin --bundles app,dmg` and
    `APPLE_SIGNING_IDENTITY` set on the signing Mac (see
@@ -93,11 +101,14 @@ Verification with `codesign --verify --deep` is read-only and is fine — the
 verify script uses `--deep` to *check*, never to sign. `--entitlements` is
 omitted (empty; see below) so the hardened-runtime defaults apply.
 
-Prove that the empty-entitlements decision holds *before* any Developer ID
-certificate is available, using an ad-hoc signature (local evidence only —
-an ad-hoc build must never be distributed; `codesign -d` fails on an
-unsigned bundle, so ad-hoc signing is needed to reach the entitlements
-dump at all):
+Distribution signing and notarization cannot run until the Developer ID
+certificate is installed — they need no ad-hoc substitute. Empty
+entitlements, by contrast, can be proven right now with ad-hoc signing
+and need no Developer ID. Prove that the empty-entitlements decision
+holds *before* any certificate is available, using an ad-hoc signature
+(local evidence only — an ad-hoc build must never be distributed;
+`codesign -d` fails on an unsigned bundle, so ad-hoc signing is needed to
+reach the entitlements dump at all):
 
 ```sh
 # (a) ad-hoc sign for local proof only (not for distribution):
@@ -107,7 +118,7 @@ codesign -s - --force --deep 'Cloud Itonami.app'
 codesign -d --entitlements :- 'Cloud Itonami.app' > entitlements.adhoc-evidence.txt
 
 # (c) save the signature identity lines:
-codesign -dvvv 'Cloud Itonami.app' > codesign-adhoc.txt
+codesign -dvvv 'Cloud Itonami.app' | grep -E 'Signature|Authority' > codesign-adhoc.txt
 ```
 
 `--deep` is used here only for this throwaway ad-hoc proof; for Developer ID
@@ -150,11 +161,11 @@ universal `arm64 + x86_64` binary. See the full mode table in
 Entitlements are shipped empty on purpose: the hardened-runtime defaults
 are sufficient, the WKWebView runs in a separate process, and this host has
 no Tauri/wasm/JIT code that needs an executable-memory or JIT entitlement.
-Prove emptiness with the ad-hoc steps in
-[Manual signing](#manual-signing-what-tauri-does-internally) (local only,
-before any Developer ID certificate exists), then launch the app and
-confirm normal operation; if a future capability proves insufficient,
-add only the smallest missing entitlement.
+Distribution signing and notarization still wait for the certificate; only
+the entitlements proof runs now, with the ad-hoc steps in
+[Manual signing](#manual-signing-what-tauri-does-internally) (local only).
+After that, launch the app and confirm normal operation; if a future
+capability proves insufficient, add only the smallest missing entitlement.
 The committed `tauri.conf.json` omission is detailed in
 [What `tauri/src-tauri/tauri.conf.json` carries (and what it does not)](#what-taurisrc-tauritauriconfjson-carries-and-what-it-does-not).
 
