@@ -30,10 +30,13 @@ jobs:
           amu_revision="$(cat mobile/amu.lock)"
           git -C target/mobile-deps/amu fetch --depth=20 origin "$amu_revision"
           git -C target/mobile-deps/amu checkout --detach "$amu_revision"
+      # Canonical DDS source is the kotoba monorepo (AWAI-3015): the
+      # standalone jp-go-digital-design-system is gone (404), so clone
+      # kotoba-lang/kotoba and check out the dds.lock revision.
       - name: Checkout pinned DADS stylesheet source
         run: |
           set -euo pipefail
-          git clone --depth=5 --filter=blob:none --no-checkout https://github.com/kotoba-lang/jp-go-digital-design-system.git target/mobile-deps/jp-go-digital-design-system
+          git clone --depth=5 --filter=blob:none --no-checkout https://github.com/kotoba-lang/kotoba.git target/mobile-deps/jp-go-digital-design-system
           dds_revision="$(sed -n 's/^revision=//p' mobile/dds.lock)"
           git -C target/mobile-deps/jp-go-digital-design-system fetch --depth=20 origin "$dds_revision"
           git -C target/mobile-deps/jp-go-digital-design-system checkout --detach "$dds_revision"
