@@ -19,8 +19,10 @@ prerequisites are in [Required material](#required-material); the build
 commands are in [Build steps](#build-steps-local-mac-after-the-prerequisites-above);
 the release check is in [Verify a built `.app` and `.dmg`](#verify-a-built-app-and-dmg).
 This section is the GO-day checklist and the only signing/notarization
-procedure to follow. Signing, notarization and `rustup target add` have not
-been executed for this change (document-only).
+procedure to follow. Signing and notarization have not been executed
+(this Mac's keychain has 0 signing identities; the owner installs the
+certificate first). `rustup target add` was executed after condition ③
+was met (GO); the `df` record is in PR #474.
 
 ### GO checklist: 3 conditions
 
@@ -45,9 +47,10 @@ order can run. The commands are the self-checks; do not rely on memory.
 - [ ] **③ Free space recovered.** Self-check: `df -h /System/Volumes/Data`.
   Confirm comfortably more than ~1 GB is free before running
   `rustup target add` (several GiB free is the practical target, so the
-  ~1 GB download plus the universal build have room). Current state at the
-  time of writing: **NOT met** — the volume is 100% full with only roughly
-  1 GiB free. Do not run `rustup target add` until this is recovered.
+  ~1 GB download plus the universal build have room). On GO (2026-11-23)
+  this was met (83% used) and step ② was executed; the post-install
+  `df` ×3 record, with its minimum as the condition-③ record, is listed
+  in PR #474. Recheck with `df -h` before any future reinstall.
 
 Conditions ① and ② (decision/registration only) may be completed before
 condition ③, because they use no capacity. The `rustup target add` execution
@@ -88,6 +91,21 @@ Verification with `codesign --verify --deep` is read-only and is fine — the
 verify script uses `--deep` to *check*, never to sign. `--entitlements` is
 omitted (empty; see below) so the hardened-runtime defaults apply.
 
+After signing, save the effective entitlements to a local evidence file
+(never committed to git) so the empty-entitlements decision is provable
+by diff — whether anything was added or nothing was added shows in the
+saved output:
+
+```sh
+codesign -d --entitlements :- 'Cloud Itonami.app' > entitlements.after-signing.txt
+codesign -d --entitlements :- 'Cloud-Itonami-0.4.2.dmg' > entitlements-dmg.after-signing.txt
+```
+
+Keep these files outside the repository (local evidence only). On later
+builds, compare the new dump against the saved one (`diff`); any added
+entitlement appears as a difference, and an unchanged file proves that
+nothing was added.
+
 ### Notarize, staple, and verify
 
 Always submit with `--wait` so notarization finishes before stapling:
@@ -119,8 +137,11 @@ universal `arm64 + x86_64` binary. See the full mode table in
 Entitlements are shipped empty on purpose: the hardened-runtime defaults
 are sufficient, the WKWebView runs in a separate process, and this host has
 no Tauri/wasm/JIT code that needs an executable-memory or JIT entitlement.
-After signing, launch the app and confirm normal operation; if a future
-capability proves insufficient, add only the smallest missing entitlement.
+After signing, save the `codesign -d --entitlements :-` dump as shown in
+[Manual signing](#manual-signing-what-tauri-does-internally) so whether
+anything was later added is provable by diff, then launch the app and
+confirm normal operation; if a future capability proves insufficient,
+add only the smallest missing entitlement.
 The committed `tauri.conf.json` omission is detailed in
 [What `tauri/src-tauri/tauri.conf.json` carries (and what it does not)](#what-taurisrc-tauritauriconfjson-carries-and-what-it-does-not).
 
