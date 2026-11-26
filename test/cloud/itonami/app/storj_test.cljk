@@ -5,6 +5,7 @@
   accepts either. No credential for a real bucket exists in this workspace."
   (:require [kotoba.lang.error :as kerror] [kotoba.lang.text :as str]
             [kotoba.test :refer [deftest is testing]]
+            [cloud.itonami.app.http-client :as http-client]
             [cloud.itonami.app.storj :as storj]
             [drive.object :as object]
             [kotoba.bytes :as b]
@@ -105,38 +106,65 @@
 ;; ── the part that would talk to a gateway ───────────────────────────────────
 
 (deftest a-signed-request-can-actually-be-built
-  ;; The send cannot be tested without a bucket; the build can, and it is where
-  ;; the first real request would most plausibly die. SigV4 signs `host`, and
-  ;; java.net.http throws IllegalArgumentException rather than ignoring a
-  ;; header it owns — so passing the signed header map straight through would
-  ;; fail on the first call, with a credential present and nothing else wrong.
-  (let [req (storj/build-request
-             {:method "PUT" :url "https://gateway.storjshare.io/acme/obj-1"
-              :headers {"host" "gateway.storjshare.io"
-                        "content-length" "3"
-                        "authorization" "AWS4-HMAC-SHA256 Credential=..."
-                        "x-amz-content-sha256" "abc"}
-              :body (byte-array [1 2 3])})]
-    (is (= "PUT" (.method req)))
-    (testing "the headers SigV4 signed and the client does not own are sent"
-      (is (= ["AWS4-HMAC-SHA256 Credential=..."]
-             (.allValues (.headers req) "authorization")))
-      (is (= ["abc"] (.allValues (.headers req) "x-amz-content-sha256"))))
-    (testing "and the ones it owns are left to it, rather than throwing"
-      (is (empty? (.allValues (.headers req) "host")))
-      (is (empty? (.allValues (.headers req) "content-length"))))
-    (testing "the client derives the same host the signature used"
-      (is (= "gateway.storjshare.io" (.getHost (.uri req))))))
-  (testing "a HEAD has no body publisher content"
-    (is (zero? (.contentLength (.get (.bodyPublisher
-                                      (storj/build-request
-                                       {:method "HEAD" :url "https://gateway.storjshare.io/acme/k"
-                                        :headers {} :body nil})))))))
-  (testing "and a vector body becomes the bytes it names"
-    (is (= 3 (.contentLength (.get (.bodyPublisher
-                                    (storj/build-request
-                                     {:method "PUT" :url "https://gateway.storjshare.io/acme/k"
-                                      :headers {} :body [7 8 200]}))))))))
+  ;; The send cannot be tested without a bucket; the translation into the
+  ;; workspace transport can, and it is where the first real request would
+  ;; most plausibly die. `build-request` used to be that seam, but the JVM
+  ;; builder is no longer this namespace's boundary: `storj/http` now hands a
+  ;; transport map to `http-client/request`. SigV4 signs `host` while the
+  ;; transport owns it, so passing the signed header map straight through
+  ;; would still fail on the first call, with a credential present and nothing
+  ;; else wrong.
+  (let [sent (atom nil)
+        response (atom {:status 200 :headers {} :body nil})]
+    (with-redefs [http-client/request
+                  (fn [req]
+                    (reset! sent req)
+                    @response)]
+      (testing "the headers SigV4 signed and the client does not own are sent"
+        (p/-request (storj/http)
+                    {:method "PUT" :url "https://gateway.storjshare.io/acme/obj-1"
+                     :headers {"host" "gateway.storjshare.io"
+                               "content-length" "3"
+                               "connection" "keep-alive"
+                               "expect" "100-continue"
+                               "upgrade" "websocket"
+                               "authorization" "AWS4-HMAC-SHA256 Credential=..."
+                               "x-amz-content-sha256" "abc"
+                               "x-amz-date" "20260730T000000Z"
+                               "content-type" "application/octet-stream"}
+                     :body (byte-array [1 2 3])})
+        (is (= {:url "https://gateway.storjshare.io/acme/obj-1"
+                :method :put
+                :timeout-seconds 60
+                :headers {"authorization" "AWS4-HMAC-SHA256 Credential=..."
+                          "x-amz-content-sha256" "abc"
+                          "x-amz-date" "20260730T000000Z"
+                          "content-type" "application/octet-stream"}
+                :body "AQID"}
+               @sent)))
+      (testing "a HEAD carries no body"
+        (reset! sent nil)
+        (p/-request (storj/http)
+                    {:method "HEAD" :url "https://gateway.storjshare.io/acme/k"
+                     :headers {} :body nil})
+        (is (= {:url "https://gateway.storjshare.io/acme/k"
+                :method :head
+                :timeout-seconds 60
+                :headers {}
+                :body nil}
+               @sent)))
+      (testing "a vector body becomes the bytes it names"
+        (reset! sent nil)
+        (p/-request (storj/http)
+                    {:method "PUT" :url "https://gateway.storjshare.io/acme/k"
+                     :headers {} :body [7 8 200]})
+        (is (= "BwjI" (:body @sent))))
+      (testing "and a binary response becomes bytes again across the string transport"
+        (reset! response {:status 200 :headers {} :body "AQID"})
+        (let [resp (p/-request (storj/http)
+                               {:method "PUT" :url "https://gateway.storjshare.io/acme/obj-1"
+                                :headers {} :body (byte-array [1 2 3])})]
+          (is (= [1 2 3] (b/->bytes (:body resp)))))))))
 
 ;; ── what this does not prove ────────────────────────────────────────────────
 
