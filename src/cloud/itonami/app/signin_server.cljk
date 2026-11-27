@@ -486,10 +486,13 @@
     {:url url :state state-value :transaction-id tid}))
 
 (defn- central-exchange! [state-value code]
-  (let [txn (get-in (identity-state) [:central-auth-transactions state-value])]
+  (let [txn (when (and (string? state-value) (not (str/blank? state-value)))
+              (get-in (identity-state) [:central-auth-transactions state-value]))]
     (when-not (and txn (not (:used? txn)) (pos? (compare (:expires-at txn) (now-iso))))
       (throw (ex-info "中央認証 state が無効です。" {:type :central-auth/invalid-state})))
     (transact! (fn [s] (assoc-in s [:identity :central-auth-transactions state-value :used?] true)))
+    (when-not (and (string? code) (not (str/blank? code)))
+      (throw (ex-info "中央認証の認可コードがありません。" {:type :central-auth/missing-code})))
     (let [body (form-encode {"grant_type" "authorization_code"
                              "code" code
                              "client_id" client-id
@@ -517,13 +520,16 @@
                           (catch :default e (reject e)))))
       (.then (fn [tokens]
                (let [access (aget tokens "access_token")]
-                 (when-not access
+                 (when-not (and (string? access) (not (str/blank? access)))
                    (throw (ex-info "token 応答に access_token がありません。" {:status 400})))
                  (-> (js/fetch (str issuer "/userinfo")
                                #js {:headers #js {"Authorization" (str "Bearer " access)
                                                   "Accept" "application/json"
                                                   "User-Agent" "cloud-itonami-app"}})
-                     (.then (fn [r] (.text r)))
+                     (.then (fn [r]
+                              (if-not (<= 200 (.-status r) 299)
+                                (throw (ex-info "userinfo endpoint が要求を拒否しました。" {:status (.-status r)}))
+                                (.text r))))
                      (.then (fn [text] (js/JSON.parse text)))))))))
 
 ;; ---------- controller-link (iPhone → Mac, cross-device) ----------
@@ -532,6 +538,8 @@
 ;; controller-link.js displays it). This server redeems the code server-to-
 ;; server, reads the session it gets back, and claims the same local identity
 ;; the callback route claims — then wakes the pending handoff.
+(defonce ^:private in-flight-link-codes (atom #{}))
+
 (defn- central-link-complete! [code]
   (-> (js/fetch (str issuer "/v1/kotoba-link/complete")
                 #js {:method "POST"
@@ -546,8 +554,8 @@
                  (if-not (and (<= 200 (.-status r) 399) setc)
                    (throw (ex-info "controller-link が拒否されました。"
                                    {:status (.-status r) :type :controller-link/refused}))
-                   (let [tok (second (re-seq #"__Host-itonami_session=([^;]+)" setc))]
-                     (when-not tok
+                   (let [tok (second (re-find #"__Host-itonami_session=([^;]+)" setc))]
+                     (when-not (and (string? tok) (not (str/blank? tok)))
                        (throw (ex-info "応答に session cookie がありません。"
                                        {:type :controller-link/no-cookie})))
                      tok)))))
@@ -555,7 +563,11 @@
                (-> (js/fetch (str issuer "/v1/session")
                              #js {:headers #js {"Cookie" (str "__Host-itonami_session=" session-token)
                                                 "Accept" "application/json"}})
-                   (.then (fn [r] (.text r)))
+                   (.then (fn [r]
+                            (if-not (<= 200 (.-status r) 299)
+                              (throw (ex-info "session endpoint が要求を拒否しました。"
+                                              {:status (.-status r) :type :controller-link/session-error}))
+                              (.text r))))
                    (.then (fn [text] (js/JSON.parse text))))))))
 
 (defn wake-handoff-with-token!
@@ -589,6 +601,9 @@
         email (aget profile "email")
         display-name (or (aget profile "display-name") (aget profile "name"))
         state (identity-state)
+        _ (when-not (and (string? did) (not (str/blank? did)))
+            (throw (ex-info "この中央 DID に結ばれた User がありません。"
+                            {:type :central-auth/unknown-identity})))
         ;; 本物: login-identities の [provider subject] で既存 User を引く。
         ;; この store の login-identities は keyed [:itonami-cloud did:key]。
         matching (first (vals (into {}
@@ -1644,8 +1659,9 @@
     (.then (read-body! req)
            (fn [body]
              (let [htok (:handoff body)
-                   h (when htok (get-in (identity-state) [:handoffs htok]))]
-               (if (and h (:ready? h)
+                   h (when (and (string? htok) (not (str/blank? htok)))
+                       (get-in (identity-state) [:handoffs htok]))]
+               (if (and h (true? (:ready? h))
                         (pos? (compare (:expires-at h) (now-iso)))
                         (:token h))
                  ;; one-time: burn the handoff and hand the webview its own
@@ -1664,31 +1680,45 @@
     ;; pending handoff (the webview that asked for this sign-in).
     (.then (read-body! req)
            (fn [body]
-             (let [code (:code body)
-                   session (live-session-for-token (get cookies cookie-name))]
+             (let [code (:code body)]
                (if-not (and (string? code) (<= 16 (count code) 256))
-                 (json res 400 {"ok" false "error" "接続コードの形式が違います。"})
-                 (-> (central-link-complete! code)
-                     (.then (fn [profile]
-                              (let [did (or (aget profile "did") (aget profile "sub"))]
-                                (when-not (get profile "valid")
-                                  (throw (ex-info "セッションが無効です。"
-                                                  {:type :controller-link/invalid})))
-                                did)))
-                     (.then (fn [did]
-                              (let [profile #js {"did" did "sub" did}
-                                    sess (central-claim-identity! profile)
-                                    tok (:token sess)]
-                                ;; wake every pending handoff (the link code
-                                ;; carries no state) — the webview's poll
-                                ;; picks the first ready one.
-                                (wake-handoff-with-token! nil tok)
-                                (json res 200 {"ok" true "did" did}
-                                      (session-cookie tok)))))
-                     (.catch (fn [e]
-                               (println :link-error (str e))
-                               (json res 400 {"ok" false
-                                              "error" {"message" "コードが拒否されました。iPhone の接続画面でコードを作り直してください。"}}))))))))
+                 (json res 400 {"ok" false
+                                "error" {"message" "接続コードの形式が違います。"}})
+                 (let [code-digest (digest code)]
+                   (if (or (get-in (identity-state) [:used-link-codes code-digest])
+                           (contains? @in-flight-link-codes code-digest))
+                     (json res 400 {"ok" false
+                                    "error" {"message" "コードが拒否されました。iPhone の接続画面でコードを作り直してください。"}})
+                     (do
+                       (swap! in-flight-link-codes conj code-digest)
+                       (-> (central-link-complete! code)
+                           (.then (fn [profile]
+                                    (let [did (or (aget profile "did") (aget profile "sub"))]
+                                      (when-not (and (true? (aget profile "valid"))
+                                                     (string? did)
+                                                     (not (str/blank? did)))
+                                        (throw (ex-info "セッションが無効です。"
+                                                        {:type :controller-link/invalid})))
+                                      did)))
+                           (.then (fn [did]
+                                    (let [profile #js {"did" did "sub" did}
+                                          sess (central-claim-identity! profile)
+                                          tok (:token sess)]
+                                      (transact! (fn [s]
+                                                   (assoc-in s [:identity :used-link-codes code-digest]
+                                                             {:used-at (now-iso)})))
+                                      (swap! in-flight-link-codes disj code-digest)
+                                      ;; wake every pending handoff (the link code
+                                      ;; carries no state) — the webview's poll
+                                      ;; picks the first ready one.
+                                      (wake-handoff-with-token! nil tok)
+                                      (json res 200 {"ok" true "did" did}
+                                            (session-cookie tok)))))
+                           (.catch (fn [e]
+                                     (swap! in-flight-link-codes disj code-digest)
+                                     (println :link-error (str e))
+                                     (json res 400 {"ok" false
+                                                    "error" {"message" "コードが拒否されました。iPhone の接続画面でコードを作り直してください。"}})))))))))))
 
     (and (= method "GET") (re-find #"/api/bots/[^/]+/messages$" p))
     (let [bot-id (second (re-find #"/api/bots/([^/]+)/messages$" p))]
@@ -1714,29 +1744,30 @@
                    (clj->js {:error {:type "not-this-server"
                                      :message (str "signin-server serves the sign-in surface only: " p)}}))))))
 
+(defn handle-request [req res]
+  (try
+    (let [url (js/URL. (str origin (.-url req)))
+          method (.-method req)
+          p (aget url "pathname")
+          cookies (cookies req)
+          session (live-session-for-token
+                   (or (bearer-token req) (get cookies cookie-name)))]
+      (route req res method p session url))
+    (catch :default e
+      (println :route-error (str e))
+      (try (.writeHead res 500 #js {"content-type" "application/json"})
+           (catch :default _ nil))
+      (try (.end res (js/JSON.stringify (clj->js {:error (str e)})))
+           (catch :default _ nil)))))
+
 (defn -main [& _]
   (.on js/process "uncaughtException" (fn [e] (println :uncaught (str e))))
   (println "signin-server on" rp-id origin "port" port
            "users" (count (:users (identity-state)))
            "passkeys" (count (:passkeys (identity-state))))
-  (doto (.createServer http
-                     (fn [req res]
-                       (try
-                         (let [url (js/URL. (str origin (.-url req)))
-                               method (.-method req)
-                               p (aget url "pathname")
-                               cookies (cookies req)
-                               session (live-session-for-token
-                                        (or (bearer-token req) (get cookies cookie-name)))]
-                           (route req res method p session url))
-                         (catch :default e
-                           (println :route-error (str e))
-                           (try (.writeHead res 500 #js {"content-type" "application/json"})
-                                (catch :default _ nil))
-                           (try (.end res (js/JSON.stringify (clj->js {:error (str e)})))
-                                (catch :default _ nil))))))
-  (.listen port "127.0.0.1"
-           (fn [] (println "signin-server listening http://localhost:" port)))))
+  (doto (.createServer http handle-request)
+    (.listen port "127.0.0.1"
+             (fn [] (println "signin-server listening http://localhost:" port)))))
 
 ;; CLOUD_ITONAMI_SIGNIN_NO_LISTEN=1 loads this namespace without binding the
 ;; port, for a test that wants the functions and not a server.
