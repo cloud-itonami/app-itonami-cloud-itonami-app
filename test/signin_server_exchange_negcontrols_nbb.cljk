@@ -1,0 +1,589 @@
+;; Zone B-23 b23-neg-30: signin exchange code negative controls & /api/auth/itonami/link error shape.
+;;
+;;     kbb --backend sci --classpath "src:resources:scripts/nbb_compat" test/signin_server_exchange_negcontrols_nbb.cljk
+;;
+;;   0  all checks passed     1  a check failed
+;;
+;; Loads `cloud.itonami.app.signin-server` with CLOUD_ITONAMI_SIGNIN_NO_LISTEN=1
+;; against a scratch app dir, binds a real loopback HTTP server to
+;; `signin-server/handle-request`, intercepts only outbound `https://auth.itonami.cloud/*`
+;; fetch calls with a deterministic stateful mock central auth plane, and
+;; verifies all 3 exchange paths (central callback, POST /api/auth/itonami/handoff,
+;; POST /api/auth/itonami/link) against forged/malformed, expired, and reused
+;; codes/tokens plus positive controls and /api/auth/itonami/link 400 error shape.
+(ns signin-server-exchange-negcontrols-nbb
+  (:require ["node:fs" :as fs]
+            ["node:http" :as http]
+            ["node:os" :as os]
+            ["node:path" :as path]
+            [kotoba.lang.edn :as edn]
+            [kotoba.lang.text :as str]))
+
+(def dir (fs/mkdtempSync (path/join (os/tmpdir) "signin-negcontrols-")))
+(fs/mkdirSync (path/join dir "data") #js {:recursive true})
+(fs/mkdirSync (path/join dir "resources") #js {:recursive true})
+
+(def far "2099-01-01T00:00:00.000Z")
+(def past "2000-01-01T00:00:00.000Z")
+(def owner-user-id "user-owner-1")
+(def owner-org-id "org-owner-1")
+(def owner-membership-id "mem-owner-1")
+(def owner-did "did:key:z6MkTestOwnerNegControl11111111111111111111")
+(def foreign-did "did:key:z6MkForeignUnknownDid22222222222222222222")
+
+(fs/writeFileSync
+ (path/join dir "data" "state.edn")
+ (pr-str
+  {:identity
+   {:users {owner-user-id {:id owner-user-id
+                           :account-id "owner@example.test"
+                           :display-name "Owner"
+                           :default-membership-id owner-membership-id
+                           :passkey-enrolled? false}}
+    :memberships {owner-membership-id {:id owner-membership-id
+                                       :user-id owner-user-id
+                                       :organization-id owner-org-id
+                                       :role :owner}}
+    :login-identities {[:itonami-cloud owner-did] {:provider :itonami-cloud
+                                                   :subject owner-did
+                                                   :user-id owner-user-id}}
+    :passkeys {}
+    :webauthn-transactions {}
+    :sessions {}
+    :central-auth-transactions
+    {"state-missing-code-1" {:id "ca-1" :state "state-missing-code-1"
+                             :issuer "https://auth.itonami.cloud"
+                             :client-id "cloud-itonami-app-native"
+                             :redirect-uri "http://localhost:1338/api/auth/itonami/callback"
+                             :scope "identity:read" :verifier "v-mc-1"
+                             :mode :authenticate :created-at past :expires-at far :used? false}
+     "state-blank-code-2"   {:id "ca-2" :state "state-blank-code-2"
+                             :issuer "https://auth.itonami.cloud"
+                             :client-id "cloud-itonami-app-native"
+                             :redirect-uri "http://localhost:1338/api/auth/itonami/callback"
+                             :scope "identity:read" :verifier "v-bc-2"
+                             :mode :authenticate :created-at past :expires-at far :used? false}
+     "state-forged-code"    {:id "ca-3" :state "state-forged-code"
+                             :issuer "https://auth.itonami.cloud"
+                             :client-id "cloud-itonami-app-native"
+                             :redirect-uri "http://localhost:1338/api/auth/itonami/callback"
+                             :scope "identity:read" :verifier "v-fc-3"
+                             :mode :authenticate :created-at past :expires-at far :used? false}
+     "state-expired-txn"    {:id "ca-4" :state "state-expired-txn"
+                             :issuer "https://auth.itonami.cloud"
+                             :client-id "cloud-itonami-app-native"
+                             :redirect-uri "http://localhost:1338/api/auth/itonami/callback"
+                             :scope "identity:read" :verifier "v-exp-4"
+                             :mode :authenticate :created-at past :expires-at past :used? false}
+     "state-expired-code"   {:id "ca-5" :state "state-expired-code"
+                             :issuer "https://auth.itonami.cloud"
+                             :client-id "cloud-itonami-app-native"
+                             :redirect-uri "http://localhost:1338/api/auth/itonami/callback"
+                             :scope "identity:read" :verifier "v-ec-5"
+                             :mode :authenticate :created-at past :expires-at far :used? false}
+     "state-unknown-did"    {:id "ca-6" :state "state-unknown-did"
+                             :issuer "https://auth.itonami.cloud"
+                             :client-id "cloud-itonami-app-native"
+                             :redirect-uri "http://localhost:1338/api/auth/itonami/callback"
+                             :scope "identity:read" :verifier "v-ud-6"
+                             :mode :authenticate :created-at past :expires-at far :used? false}
+     "state-userinfo-401"   {:id "ca-7" :state "state-userinfo-401"
+                             :issuer "https://auth.itonami.cloud"
+                             :client-id "cloud-itonami-app-native"
+                             :redirect-uri "http://localhost:1338/api/auth/itonami/callback"
+                             :scope "identity:read" :verifier "v-u401-7"
+                             :mode :authenticate :created-at past :expires-at far :used? false}
+     "state-valid-1"        {:id "ca-8" :state "state-valid-1"
+                             :issuer "https://auth.itonami.cloud"
+                             :client-id "cloud-itonami-app-native"
+                             :redirect-uri "http://localhost:1338/api/auth/itonami/callback"
+                             :scope "identity:read" :verifier "v-ok-8"
+                             :mode :authenticate :created-at past :expires-at far :used? false}
+     "state-reused-code"    {:id "ca-9" :state "state-reused-code"
+                             :issuer "https://auth.itonami.cloud"
+                             :client-id "cloud-itonami-app-native"
+                             :redirect-uri "http://localhost:1338/api/auth/itonami/callback"
+                             :scope "identity:read" :verifier "v-rc-9"
+                             :mode :authenticate :created-at past :expires-at far :used? false}}
+    :handoffs
+    {"handoff-pending-1"    {:state "state-valid-1" :ready? false :expires-at far :created-at past}
+     "handoff-not-ready"    {:state "state-other"   :ready? false :expires-at far :created-at past}
+     "handoff-expired-ok"   {:state "state-exp"     :ready? true  :token "stale-exp-tok"
+                             :expires-at past :created-at past}
+     "handoff-spent-clean"  {:state "state-sp1"     :ready? :spent :token nil
+                             :expires-at far :created-at past}
+     "handoff-spent-stale"  {:state "state-sp2"     :ready? :spent :token "stale-spent-tok"
+                             :expires-at far :created-at past}}}}))
+
+(aset js/process.env "CLOUD_ITONAMI_APP_DIR" dir)
+(aset js/process.env "CLOUD_ITONAMI_SIGNIN_NO_LISTEN" "1")
+(aset js/process.env "CLOUD_ITONAMI_PORT" "0")
+
+;; Install fetch interceptor BEFORE requiring signin-server so SCI resolves
+;; `js/fetch` in signin-server to our deterministic mock (zero real network).
+(def orig-fetch (aget js/globalThis "fetch"))
+(def upstream-calls (atom []))
+(def used-oauth-codes (atom #{}))
+
+(defn- fake-response [status body & [{:keys [headers]}]]
+  (let [hdrs (into {} (map (fn [[k v]] [(str/lower (str k)) v])) (or headers {}))]
+    #js {:status status
+         :ok (<= 200 status 299)
+         :headers #js {:get (fn [k] (get hdrs (str/lower (str k))))}
+         :text (fn [] (js/Promise.resolve (if (string? body) body (js/JSON.stringify (clj->js body)))))}))
+
+(defn- parse-form [body]
+  (let [p (js/URLSearchParams. (str (or body "")))
+        m (atom {})]
+    (.forEach p (fn [v k] (swap! m assoc k v)))
+    @m))
+
+(defn- mock-central-fetch [url opts]
+  (let [u (str url)
+        method (or (some-> opts .-method) "GET")
+        body (some-> opts .-body)
+        hdrs (or (some-> opts .-headers) #js {})]
+    (swap! upstream-calls conj {:url u :method method :body body})
+    (cond
+      (= u "https://auth.itonami.cloud/oauth/token")
+      (let [{:strs [code]} (parse-form body)]
+        (cond
+          (contains? @used-oauth-codes code)
+          (js/Promise.resolve (fake-response 400 {:error "invalid_grant" :error_description "code already used"}))
+
+          (= code "valid-code-1")
+          (do (swap! used-oauth-codes conj code)
+              (js/Promise.resolve (fake-response 200 {:access_token "at-owner-1" :token_type "Bearer"})))
+
+          (= code "unknown-did-code")
+          (do (swap! used-oauth-codes conj code)
+              (js/Promise.resolve (fake-response 200 {:access_token "at-foreign-1" :token_type "Bearer"})))
+
+          (= code "userinfo-401-code")
+          (do (swap! used-oauth-codes conj code)
+              (js/Promise.resolve (fake-response 200 {:access_token "at-401-1" :token_type "Bearer"})))
+
+          (= code "expired-oauth-code")
+          (js/Promise.resolve (fake-response 400 {:error "invalid_grant" :error_description "code expired"}))
+
+          :else
+          (js/Promise.resolve (fake-response 400 {:error "invalid_grant"}))))
+
+      (= u "https://auth.itonami.cloud/userinfo")
+      (let [auth (aget hdrs "Authorization")]
+        (cond
+          (= auth "Bearer at-owner-1")
+          (js/Promise.resolve (fake-response 200 {:sub owner-did :did owner-did}))
+
+          (= auth "Bearer at-foreign-1")
+          (js/Promise.resolve (fake-response 200 {:sub foreign-did :did foreign-did}))
+
+          (= auth "Bearer at-401-1")
+          (js/Promise.resolve (fake-response 401 {:error "invalid_token" :sub owner-did :did owner-did}))
+
+          :else
+          (js/Promise.resolve (fake-response 401 {:error "unauthorized"}))))
+
+      (= u "https://auth.itonami.cloud/v1/kotoba-link/complete")
+      (let [{:strs [code]} (parse-form body)]
+        (case code
+          ;; Deliberately permissive on replay to prove signin_server burns locally!
+          "link-valid-code-32chars-00000001"
+          (js/Promise.resolve
+           (fake-response 302 "" {:headers {"set-cookie" "__Host-itonami_session=csess-owner-1; Path=/; HttpOnly; Secure"}}))
+
+          "link-invalid-sess-00000000000004"
+          (js/Promise.resolve
+           (fake-response 302 "" {:headers {"set-cookie" "__Host-itonami_session=csess-invalid; Path=/; HttpOnly; Secure"}}))
+
+          "link-unknown-did-000000000000005"
+          (js/Promise.resolve
+           (fake-response 302 "" {:headers {"set-cookie" "__Host-itonami_session=csess-foreign; Path=/; HttpOnly; Secure"}}))
+
+          "link-sess-401-000000000000000006"
+          (js/Promise.resolve
+           (fake-response 302 "" {:headers {"set-cookie" "__Host-itonami_session=csess-401; Path=/; HttpOnly; Secure"}}))
+
+          "link-no-cookie-00000000000000007"
+          (js/Promise.resolve (fake-response 302 ""))
+
+          ;; forged, expired, upstream-spent
+          (js/Promise.resolve (fake-response 400 {:error "invalid_code"}))))
+
+      (= u "https://auth.itonami.cloud/v1/session")
+      (let [cookie (aget hdrs "Cookie")]
+        (cond
+          (= cookie "__Host-itonami_session=csess-owner-1")
+          (js/Promise.resolve (fake-response 200 {:valid true :did owner-did :sub owner-did}))
+
+          (= cookie "__Host-itonami_session=csess-invalid")
+          (js/Promise.resolve (fake-response 200 {:valid false :did owner-did :sub owner-did}))
+
+          (= cookie "__Host-itonami_session=csess-foreign")
+          (js/Promise.resolve (fake-response 200 {:valid true :did foreign-did :sub foreign-did}))
+
+          (= cookie "__Host-itonami_session=csess-401")
+          (js/Promise.resolve (fake-response 401 {:valid true :did owner-did :sub owner-did}))
+
+          :else
+          (js/Promise.resolve (fake-response 401 {:valid false}))))
+
+      :else
+      (js/Promise.reject (js/Error. (str "unexpected central fetch: " u))))))
+
+(aset js/globalThis "fetch"
+      (fn [url opts]
+        (if (str/starts-with? (str url) "https://auth.itonami.cloud/")
+          (mock-central-fetch url opts)
+          (orig-fetch url opts))))
+
+(require 'cloud.itonami.app.signin-server)
+
+;; ---------- check harness ----------
+
+(def total-checks (atom 0))
+(def failed-checks (atom 0))
+(def http-exchanges (atom 0))
+
+(defn- check! [label ok?]
+  (swap! total-checks inc)
+  (println (if ok? "PASS" "FAIL") label)
+  (when-not ok? (swap! failed-checks inc)))
+
+(defn- read-store []
+  (edn/read-string (fs/readFileSync (path/join dir "data" "state.edn") "utf8")))
+
+(defn- session-ids []
+  (set (keys (get-in (read-store) [:identity :sessions]))))
+
+;; ---------- HTTP helper against local signin-server ----------
+
+(defn- http-req [base method p & [{:keys [body]}]]
+  (swap! http-exchanges inc)
+  (-> (orig-fetch
+       (str base p)
+       (clj->js (cond-> {:method method :redirect "manual"}
+                  (some? body) (assoc :headers {"content-type" "application/json"}
+                                      :body (js/JSON.stringify (clj->js body))))))
+      (.then (fn [r]
+               (-> (.text r)
+                   (.then (fn [t]
+                            {:status (.-status r)
+                             :location (.get (.-headers r) "location")
+                             :set-cookie (.get (.-headers r) "set-cookie")
+                             :raw t
+                             :json (try (js->clj (js/JSON.parse t))
+                                        (catch :default _ nil))})))))))
+
+(defn- no-session-cookie? [resp]
+  (nil? (:set-cookie resp)))
+
+(defn- has-session-cookie? [resp]
+  (and (string? (:set-cookie resp))
+       (str/includes? (:set-cookie resp) "cloud_itonami_identity=")))
+
+(defn- valid-link-400-shape? [resp]
+  (and (= 400 (:status resp))
+       (map? (:json resp))
+       (= false (get (:json resp) "ok"))
+       (map? (get (:json resp) "error"))
+       (string? (get-in (:json resp) ["error" "message"]))
+       (not (str/blank? (get-in (:json resp) ["error" "message"])))))
+
+;; ---------- test runner ----------
+
+(def server (.createServer http signin-server/handle-request))
+
+(.listen
+ server 0 "127.0.0.1"
+ (fn []
+   (let [port (.-port (.address server))
+         base (str "http://127.0.0.1:" port)]
+     (-> (js/Promise.resolve nil)
+
+         ;; =================================================================
+         ;; PATH 1: GET /api/auth/itonami/callback (L1611-1638)
+         ;; =================================================================
+
+         (.then (fn [_]
+                  (reset! upstream-calls [])
+                  (http-req base "GET" "/api/auth/itonami/callback?state=forged-unknown-state&code=forged-code")))
+         (.then (fn [r]
+                  (check! "callback: forged/unknown state -> 302 /?auth=failed"
+                          (and (= 302 (:status r)) (= "/?auth=failed" (:location r))))
+                  (check! "callback: forged/unknown state -> no Set-Cookie, no session, no upstream call"
+                          (and (no-session-cookie? r) (empty? (session-ids)) (empty? @upstream-calls)))
+                  (http-req base "GET" "/api/auth/itonami/callback?state=state-missing-code-1")))
+         (.then (fn [r]
+                  (check! "callback: missing code -> 302 /?auth=failed, no cookie, no session, no upstream call, state burned"
+                          (and (= 302 (:status r))
+                               (= "/?auth=failed" (:location r))
+                               (no-session-cookie? r)
+                               (empty? (session-ids))
+                               (empty? @upstream-calls)
+                               (true? (get-in (read-store) [:identity :central-auth-transactions "state-missing-code-1" :used?]))))
+                  (http-req base "GET" "/api/auth/itonami/callback?state=state-blank-code-2&code=%20%20")))
+         (.then (fn [r]
+                  (check! "callback: blank code -> 302 /?auth=failed, no cookie, no session, no upstream call"
+                          (and (= 302 (:status r))
+                               (= "/?auth=failed" (:location r))
+                               (no-session-cookie? r)
+                               (empty? (session-ids))
+                               (empty? @upstream-calls)))
+                  (http-req base "GET" "/api/auth/itonami/callback?state=state-forged-code&code=forged-code-xyz")))
+         (.then (fn [r]
+                  (check! "callback: forged code rejected by token endpoint -> 302 /?auth=failed, no cookie, no session, state burned"
+                          (and (= 302 (:status r))
+                               (= "/?auth=failed" (:location r))
+                               (no-session-cookie? r)
+                               (empty? (session-ids))
+                               (true? (get-in (read-store) [:identity :central-auth-transactions "state-forged-code" :used?]))))
+                  (reset! upstream-calls [])
+                  (http-req base "GET" "/api/auth/itonami/callback?state=state-expired-txn&code=valid-code-1")))
+         (.then (fn [r]
+                  (check! "callback: expired state transaction -> 302 /?auth=failed, no cookie, no session, no upstream call"
+                          (and (= 302 (:status r))
+                               (= "/?auth=failed" (:location r))
+                               (no-session-cookie? r)
+                               (empty? (session-ids))
+                               (empty? @upstream-calls)))
+                  (http-req base "GET" "/api/auth/itonami/callback?state=state-expired-code&code=expired-oauth-code")))
+         (.then (fn [r]
+                  (check! "callback: expired authorization code -> 302 /?auth=failed, no cookie, no session"
+                          (and (= 302 (:status r))
+                               (= "/?auth=failed" (:location r))
+                               (no-session-cookie? r)
+                               (empty? (session-ids))))
+                  (http-req base "GET" "/api/auth/itonami/callback?state=state-unknown-did&code=unknown-did-code")))
+         (.then (fn [r]
+                  (check! "callback: unknown central DID -> 302 /?auth=failed, no cookie, no session, user stays unenrolled"
+                          (and (= 302 (:status r))
+                               (= "/?auth=failed" (:location r))
+                               (no-session-cookie? r)
+                               (empty? (session-ids))
+                               (false? (get-in (read-store) [:identity :users owner-user-id :passkey-enrolled?]))))
+                  (http-req base "GET" "/api/auth/itonami/callback?state=state-userinfo-401&code=userinfo-401-code")))
+         (.then (fn [r]
+                  (check! "callback: non-2xx /userinfo (even echoing owner DID) -> 302 /?auth=failed, no cookie, no session"
+                          (and (= 302 (:status r))
+                               (= "/?auth=failed" (:location r))
+                               (no-session-cookie? r)
+                               (empty? (session-ids))
+                               (false? (get-in (read-store) [:identity :users owner-user-id :passkey-enrolled?]))
+                               (false? (get-in (read-store) [:identity :handoffs "handoff-pending-1" :ready?]))))
+                  ;; Positive control: valid state + valid code -> 302 / + Set-Cookie + 1 session + wakes handoff-pending-1
+                  (http-req base "GET" "/api/auth/itonami/callback?state=state-valid-1&code=valid-code-1")))
+         (.then (fn [r]
+                  (check! "callback: positive control -> 302 /, Set-Cookie, 1 session, state burned, handoff woken"
+                          (and (= 302 (:status r))
+                               (= "/" (:location r))
+                               (has-session-cookie? r)
+                               (= 1 (count (session-ids)))
+                               (true? (get-in (read-store) [:identity :central-auth-transactions "state-valid-1" :used?]))
+                               (true? (get-in (read-store) [:identity :handoffs "handoff-pending-1" :ready?]))))
+                  ;; Reused exact state + code -> rejected, no cookie, no new session, zero upstream calls
+                  (reset! upstream-calls [])
+                  (http-req base "GET" "/api/auth/itonami/callback?state=state-valid-1&code=valid-code-1")))
+         (.then (fn [r]
+                  (check! "callback: reused state+code -> 302 /?auth=failed, no cookie, no new session, no upstream call"
+                          (and (= 302 (:status r))
+                               (= "/?auth=failed" (:location r))
+                               (no-session-cookie? r)
+                               (= 1 (count (session-ids)))
+                               (empty? @upstream-calls)))
+                  ;; Fresh valid state + already-burned authorization code -> upstream rejects, no cookie, no new session
+                  (http-req base "GET" "/api/auth/itonami/callback?state=state-reused-code&code=valid-code-1")))
+         (.then (fn [r]
+                  (check! "callback: fresh state + reused authorization code -> 302 /?auth=failed, no cookie, no new session"
+                          (and (= 302 (:status r))
+                               (= "/?auth=failed" (:location r))
+                               (no-session-cookie? r)
+                               (= 1 (count (session-ids)))
+                               (true? (get-in (read-store) [:identity :central-auth-transactions "state-reused-code" :used?]))))
+
+                  ;; =================================================================
+                  ;; PATH 2: POST /api/auth/itonami/handoff (L1640-1658)
+                  ;; =================================================================
+                  (http-req base "POST" "/api/auth/itonami/handoff" {:body {:handoff "forged-unknown-handoff"}})))
+         (.then (fn [r]
+                  (check! "handoff: forged/unknown token -> 200 {ready?:false}, no cookie, no new session"
+                          (and (= 200 (:status r))
+                               (= {"ready?" false} (:json r))
+                               (no-session-cookie? r)
+                               (= 1 (count (session-ids)))))
+                  (http-req base "POST" "/api/auth/itonami/handoff" {:body {}})))
+         (.then (fn [r]
+                  (check! "handoff: missing handoff field -> 200 {ready?:false}, no cookie"
+                          (and (= 200 (:status r)) (= {"ready?" false} (:json r)) (no-session-cookie? r)))
+                  (http-req base "POST" "/api/auth/itonami/handoff" {:body {:handoff 12345}})))
+         (.then (fn [r]
+                  (check! "handoff: malformed non-string handoff -> 200 {ready?:false}, no cookie"
+                          (and (= 200 (:status r)) (= {"ready?" false} (:json r)) (no-session-cookie? r)))
+                  (http-req base "POST" "/api/auth/itonami/handoff" {:body {:handoff "handoff-not-ready"}})))
+         (.then (fn [r]
+                  (check! "handoff: pending (not ready) -> 200 {ready?:false}, no cookie"
+                          (and (= 200 (:status r)) (= {"ready?" false} (:json r)) (no-session-cookie? r)))
+                  (http-req base "POST" "/api/auth/itonami/handoff" {:body {:handoff "handoff-expired-ok"}})))
+         (.then (fn [r]
+                  (check! "handoff: expired (even ready+token) -> 200 {ready?:false}, no cookie, not spent"
+                          (and (= 200 (:status r))
+                               (= {"ready?" false} (:json r))
+                               (no-session-cookie? r)
+                               (= 1 (count (session-ids)))
+                               (= true (get-in (read-store) [:identity :handoffs "handoff-expired-ok" :ready?]))))
+                  (http-req base "POST" "/api/auth/itonami/handoff" {:body {:handoff "handoff-spent-clean"}})))
+         (.then (fn [r]
+                  (check! "handoff: pre-burned (:spent, nil token) -> 200 {ready?:false}, no cookie"
+                          (and (= 200 (:status r)) (= {"ready?" false} (:json r)) (no-session-cookie? r)))
+                  (http-req base "POST" "/api/auth/itonami/handoff" {:body {:handoff "handoff-spent-stale"}})))
+         (.then (fn [r]
+                  (check! "handoff: pre-burned (:spent even with stale token) -> 200 {ready?:false}, no cookie"
+                          (and (= 200 (:status r)) (= {"ready?" false} (:json r)) (no-session-cookie? r)))
+                  ;; Positive control: claim woken handoff-pending-1 -> 200 {ready?:true} + Set-Cookie + burns to :spent
+                  (http-req base "POST" "/api/auth/itonami/handoff" {:body {:handoff "handoff-pending-1"}})))
+         (.then (fn [r]
+                  (let [h (get-in (read-store) [:identity :handoffs "handoff-pending-1"])]
+                    (check! "handoff: positive control -> 200 {ready?:true}, Set-Cookie, burned to :spent + nil token"
+                            (and (= 200 (:status r))
+                                 (= {"ready?" true} (:json r))
+                                 (has-session-cookie? r)
+                                 (= :spent (:ready? h))
+                                 (nil? (:token h)))))
+                  ;; Second attempt with exact same handoff token -> rejected, no cookie, no state mutation
+                  (http-req base "POST" "/api/auth/itonami/handoff" {:body {:handoff "handoff-pending-1"}})))
+         (.then (fn [r]
+                  (let [h (get-in (read-store) [:identity :handoffs "handoff-pending-1"])]
+                    (check! "handoff: reused burned token -> 200 {ready?:false}, no cookie, no new session"
+                            (and (= 200 (:status r))
+                                 (= {"ready?" false} (:json r))
+                                 (no-session-cookie? r)
+                                 (= 1 (count (session-ids)))
+                                 (= :spent (:ready? h))
+                                 (nil? (:token h)))))
+
+                  ;; =================================================================
+                  ;; PATH 3: POST /api/auth/itonami/link (L1660-1691)
+                  ;; =================================================================
+                  (reset! upstream-calls [])
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {:code (apply str (repeat 15 "a"))}})))
+         (.then (fn [r]
+                  (check! "link: length 15 (<16 boundary) -> 400 normalized object error, no cookie, no session, no upstream call"
+                          (and (valid-link-400-shape? r)
+                               (= "接続コードの形式が違います。" (get-in (:json r) ["error" "message"]))
+                               (no-session-cookie? r)
+                               (= 1 (count (session-ids)))
+                               (empty? @upstream-calls)))
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {:code (apply str (repeat 257 "b"))}})))
+         (.then (fn [r]
+                  (check! "link: length 257 (>256 boundary) -> 400 normalized object error, no cookie, no session, no upstream call"
+                          (and (valid-link-400-shape? r)
+                               (= "接続コードの形式が違います。" (get-in (:json r) ["error" "message"]))
+                               (no-session-cookie? r)
+                               (= 1 (count (session-ids)))
+                               (empty? @upstream-calls)))
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {:code 1234567890123456}})))
+         (.then (fn [r]
+                  (check! "link: non-string code -> 400 normalized object error, no cookie, no upstream call"
+                          (and (valid-link-400-shape? r)
+                               (= "接続コードの形式が違います。" (get-in (:json r) ["error" "message"]))
+                               (no-session-cookie? r)
+                               (empty? @upstream-calls)))
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {}})))
+         (.then (fn [r]
+                  (check! "link: missing code -> 400 normalized object error, no cookie, no upstream call"
+                          (and (valid-link-400-shape? r)
+                               (= "接続コードの形式が違います。" (get-in (:json r) ["error" "message"]))
+                               (no-session-cookie? r)
+                               (empty? @upstream-calls)))
+                  ;; Forged / unknown link code at exact inclusive boundaries (16 and 256 chars)
+                  ;; passes format validation and reaches upstream (rejected with upstream message)
+                  (reset! upstream-calls [])
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {:code (apply str (repeat 16 "c"))}})))
+         (.then (fn [r]
+                  (check! "link: length 16 (inclusive lower bound) reaches upstream and rejects forged code -> 400 normalized object error"
+                          (and (valid-link-400-shape? r)
+                               (not= "接続コードの形式が違います。" (get-in (:json r) ["error" "message"]))
+                               (no-session-cookie? r)
+                               (= 1 (count (session-ids)))
+                               (= 1 (count @upstream-calls))))
+                  (reset! upstream-calls [])
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {:code (apply str (repeat 256 "d"))}})))
+         (.then (fn [r]
+                  (check! "link: length 256 (inclusive upper bound) reaches upstream and rejects forged code -> 400 normalized object error"
+                          (and (valid-link-400-shape? r)
+                               (not= "接続コードの形式が違います。" (get-in (:json r) ["error" "message"]))
+                               (no-session-cookie? r)
+                               (= 1 (count (session-ids)))
+                               (= 1 (count @upstream-calls))))
+                  ;; Forged / unknown link code (valid length)
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {:code "forged-unknown-link-code-0000001"}})))
+         (.then (fn [r]
+                  (check! "link: forged/unknown code -> 400 normalized object error, no cookie, no new session, handoff asleep"
+                          (and (valid-link-400-shape? r)
+                               (no-session-cookie? r)
+                               (= 1 (count (session-ids)))
+                               (false? (get-in (read-store) [:identity :handoffs "handoff-not-ready" :ready?]))))
+                  ;; Expired link code
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {:code "link-expired-code-00000000000003"}})))
+         (.then (fn [r]
+                  (check! "link: expired code -> 400 normalized object error, no cookie, no new session, handoff asleep"
+                          (and (valid-link-400-shape? r)
+                               (no-session-cookie? r)
+                               (= 1 (count (session-ids)))
+                               (false? (get-in (read-store) [:identity :handoffs "handoff-not-ready" :ready?]))))
+                  ;; Upstream returns no session cookie
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {:code "link-no-cookie-00000000000000007"}})))
+         (.then (fn [r]
+                  (check! "link: upstream missing session cookie -> 400 normalized object error, no cookie, no new session"
+                          (and (valid-link-400-shape? r) (no-session-cookie? r) (= 1 (count (session-ids)))))
+                  ;; Upstream /v1/session returns valid: false
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {:code "link-invalid-sess-00000000000004"}})))
+         (.then (fn [r]
+                  (check! "link: upstream /v1/session valid:false -> 400 normalized object error, no cookie, no new session"
+                          (and (valid-link-400-shape? r) (no-session-cookie? r) (= 1 (count (session-ids)))))
+                  ;; Upstream /v1/session returns HTTP 401 (even with valid:true in body)
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {:code "link-sess-401-000000000000000006"}})))
+         (.then (fn [r]
+                  (check! "link: upstream /v1/session 401 -> 400 normalized object error, no cookie, no new session"
+                          (and (valid-link-400-shape? r) (no-session-cookie? r) (= 1 (count (session-ids)))))
+                  ;; Upstream /v1/session returns unknown DID
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {:code "link-unknown-did-000000000000005"}})))
+         (.then (fn [r]
+                  (check! "link: unknown DID -> 400 normalized object error, no cookie, no new session, handoff asleep"
+                          (and (valid-link-400-shape? r)
+                               (no-session-cookie? r)
+                               (= 1 (count (session-ids)))
+                               (false? (get-in (read-store) [:identity :handoffs "handoff-not-ready" :ready?]))))
+                  ;; Upstream-rejected already-burned link code (spent elsewhere)
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {:code "link-upstream-spent-000000000002"}})))
+         (.then (fn [r]
+                  (check! "link: upstream-burned reused code -> 400 normalized object error, no cookie, no new session"
+                          (and (valid-link-400-shape? r) (no-session-cookie? r) (= 1 (count (session-ids)))))
+                  ;; Positive control: valid 32-char link code -> 200 {ok:true, did:...} + Set-Cookie + 1 new session + wakes handoff-not-ready
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {:code "link-valid-code-32chars-00000001"}})))
+         (.then (fn [r]
+                  (check! "link: positive control -> 200 {ok:true, did:owner}, Set-Cookie, +1 session, handoff woken"
+                          (and (= 200 (:status r))
+                               (= true (get (:json r) "ok"))
+                               (= owner-did (get (:json r) "did"))
+                               (has-session-cookie? r)
+                               (= 2 (count (session-ids)))
+                               (true? (get-in (read-store) [:identity :handoffs "handoff-not-ready" :ready?]))))
+                  ;; Reused exact link code -> rejected locally with 400 even though mock upstream permits replay!
+                  (reset! upstream-calls [])
+                  (http-req base "POST" "/api/auth/itonami/link" {:body {:code "link-valid-code-32chars-00000001"}})))
+         (.then (fn [r]
+                  (check! "link: reused exact code -> 400 normalized object error, no cookie, no new session, zero upstream calls"
+                          (and (valid-link-400-shape? r)
+                               (no-session-cookie? r)
+                               (= 2 (count (session-ids)))
+                               (empty? @upstream-calls)))))
+         (.catch (fn [e]
+                   (swap! failed-checks inc)
+                   (println "UNEXPECTED ERROR:" (or (some-> e .-stack) (str e)))))
+         (.finally (fn []
+                     (.close server)
+                     (fs/rmSync dir #js {:recursive true :force true})
+                     (println (str "SCANNED\t" @http-exchanges "\texchanges"))
+                     (println (str "CHECKS " @total-checks " FAILED " @failed-checks))
+                     (js/process.exit (if (zero? @failed-checks) 0 1))))))))
